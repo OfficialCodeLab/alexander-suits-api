@@ -13,17 +13,12 @@ module.exports = {
 
     attributes: {
         fullname: {
-            type: "string",
-            required: true
+            type: "string"
         },
         email: {
             type: "string",
             required: true,
             unique: true
-        },
-        password: {
-            type: "string",
-            required: true
         },
         contact_mobile: {
             type: "string"
@@ -35,7 +30,11 @@ module.exports = {
         orders: {
             type: "Array",
             defaultsTo: []
-        }
+        },
+        user_id: {
+            type: "string",
+            required: true,
+            unique: true
+        },
     }
 };
-

@@ -35,7 +35,8 @@ module.exports.routes = {
     '/': {
         view: 'homepage'
     },
-    'get /api/users/create_force' : 'UserController.trigger',
+    'get /api/users/create_force' : 'UserController.trigger', // This is a test route
+    'get /api/user' : 'UserController.getUser', // This is a test route
     'post /api/users/create' : 'UserController.createUser',
 
     'post /api/products/create' : 'ProductController.createProduct',

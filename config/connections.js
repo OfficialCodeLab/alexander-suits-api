@@ -60,7 +60,8 @@ module.exports.connections = {
    * Run: npm install sails-mongo                                             *
    *                                                                          *
    ***************************************************************************/
-  suits_mongo: secrets.suits_mongo,
+  suits_mongo: secrets.suits_mongo
+
 
   /***************************************************************************
    *                                                                          *

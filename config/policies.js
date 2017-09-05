@@ -28,6 +28,17 @@ module.exports.policies = {
 
   // '*': true,
 
+  ProductController: {
+    createProduct: 'isAuthenticated',
+    getAll: 'isAuthenticated'
+  },
+
+  UserController: {
+    createUser: 'isAuthenticated',
+    getUser: 'isAuthenticated'
+  },
+
+
   /***************************************************************************
   *                                                                          *
   * Here's an example of mapping some policies to run before a controller    *

@@ -27,7 +27,14 @@ module.exports = {
         console.log("Received GET for All Products");
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
-        sails.models.product.find().then(success => {
+        let options = {};
+        if (req.params) {
+          options = {
+            category: req.params.category
+          };
+        }
+
+        sails.models.product.find(options).then(success => {
             console.log("Logging success: ", success);
             response.json(success);
         }).catch(ex => {
@@ -38,4 +45,3 @@ module.exports = {
         })
     }
 };
-

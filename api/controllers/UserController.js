@@ -42,6 +42,37 @@ module.exports = {
             response.status = 400;
             response.json(ex);
         })
-    }
-};
+    },
 
+		getUser: (request, response) => {
+
+			console.log("Received POST for GET USER");
+			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+
+			if (request.query.id) {
+				let options = {
+					user_id: request.query.id
+				};
+
+				sails.models.user.findOne(options).then(success => {
+						if(success) {
+							console.log("Logging success: ", success);
+							response.json(success);
+						} else {
+							response.json("does_not_exist");
+						}
+				}).catch(ex => {
+						response.statusCode = 400;
+						response.status = 400;
+						response.json(ex);
+				})
+			} else {
+					response.statusCode = 400;
+					response.status = 400;
+					response.json("No ID provided");
+			}
+
+
+		}
+};
