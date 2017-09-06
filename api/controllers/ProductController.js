@@ -27,14 +27,14 @@ module.exports = {
         console.log("Received GET for All Products");
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
-        let options = {};
-        if (req.params) {
-          options = {
-            category: req.params.category
-          };
-        }
+        // let options = {};
+        // if (request.params) {
+        //   options = {
+        //     category: request.params.category
+        //   };
+        // }
 
-        sails.models.product.find(options).then(success => {
+        sails.models.product.find().then(success => {
             console.log("Logging success: ", success);
             response.json(success);
         }).catch(ex => {

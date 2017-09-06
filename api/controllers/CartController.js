@@ -33,13 +33,13 @@ module.exports = {
 			for (let product of products) {
 				let promise = new Promise((resolve, reject) => {
 					let options = {
-						product_SKU: product.product_SKU
+						id: product.id
 					};
 					sails.models.product.findOne(options).then(success => {
 							if(success) {
 								console.log("Found product: ", success);
 								let p = {
-									product_SKU: success.product_SKU,
+									product_SKU: success.id,
 									price: success.price,
 									count: product.count
 								};
@@ -55,7 +55,7 @@ module.exports = {
 					})
 				});
 
-				promises.pushObject(promise);
+				promises.push(promise);
 			}
 
 
@@ -73,11 +73,11 @@ module.exports = {
 						let new_products = old_products.concat(_products);
 						let value = {
 							products: new_products,
-							price: new_price
+							total: new_price
 						};
 						sails.models.cart.update({user_id: request.body.user_id}, value).then(success => {
-								console.log("Logging success: ", success);
-								response.json(success);
+								console.log("Logging success: ", success[0]);
+								response.json(success[0]);
 						}).catch(ex => {
 								response.statusCode = 400;
 								response.status = 400;
@@ -87,7 +87,7 @@ module.exports = {
 						let cart = {
 							user_id: request.body.user_id,
 							products: _products,
-							price: total_price
+							total: total_price
 						};
 
 						sails.models.cart.create(cart).then(success => {
@@ -137,7 +137,7 @@ module.exports = {
 		}
 
 
-	}
+	},
 
 
 	deleteCart: (request, response) => {
@@ -151,9 +151,9 @@ module.exports = {
 				sails.models.cart.destroy(options).then(success => {
 						if(success) {
 							console.log("Logging success: ", success);
-							response.json(success);
+							response.json("successful");
 						} else {
-							response.json({status:"does_not_exist"});
+							response.json("does_not_exist");
 						}
 				}).catch(ex => {
 						response.statusCode = 400;
@@ -163,7 +163,7 @@ module.exports = {
 			} else {
 					response.statusCode = 400;
 					response.status = 400;
-					response.json({status:"no_id_provided"});
+					response.json("no_id_provided");
 			}
 	}
 

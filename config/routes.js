@@ -44,10 +44,10 @@ module.exports.routes = {
     'get /api/products/all' : 'ProductController.getAll',
 
 
-    'get /api/cart' : 'ProductController.getCart',
-    'post /api/cart/update' : 'ProductController.updateCart',
-    'get /api/cart/create' : 'ProductController.createCart',
-    'get /api/cart/delete' : 'ProductController.deleteCart',
+    'get /api/cart' : 'CartController.getCart',
+    'post /api/cart/update' : 'CartController.updateCart',
+    'get /api/cart/create' : 'CartController.createCart',
+    'delete /api/cart/delete' : 'CartController.deleteCart',
 
     /***************************************************************************
      *                                                                          *
