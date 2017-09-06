@@ -49,6 +49,7 @@ module.exports = {
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 				// console.log(request.body)
+				//TODO get the request token & match that token vs the user id requested unless admin permissions
 
         sails.models.user.update({user_id: request.body.user_id}, request.body).then(success => {
             console.log("Logging success: ", success);
@@ -86,7 +87,7 @@ module.exports = {
 			} else {
 					response.statusCode = 400;
 					response.status = 400;
-					response.json("No ID provided");
+					response.json({status:"no_id_provided"});
 			}
 
 
