@@ -3297,6 +3297,10 @@ to-array@0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/to-array/-/to-array-0.1.4.tgz#17e6c11f73dd4f3d74cda7a4ff3238e9ad9bf890"
 
+toolifier@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/toolifier/-/toolifier-2.1.0.tgz#da0ac4aed14935978b70ab9df7eb3aa9bd46a7c6"
+
 topo@1.x.x:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/topo/-/topo-1.1.0.tgz#e9d751615d1bb87dc865db182fa1ca0a5ef536d5"

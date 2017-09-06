@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+let toolifier = require('toolifier');
+
 module.exports = {
 
 	createCart: (request, response) => {
@@ -37,7 +39,7 @@ module.exports = {
 					};
 					sails.models.product.findOne(options).then(success => {
 							if(success) {
-								console.log("Found product: ", success);
+								// console.log("Found product: ", success);
 								let p = {
 									product_SKU: success.id,
 									price: success.price,
@@ -67,12 +69,14 @@ module.exports = {
 				}
 				sails.models.cart.findOne({user_id: request.body.user_id}).then(success => {
 					if(success) {	//UPDATE EXISTING
-						console.log("Found Cart: ", success);
+						// console.log("Found Cart: ", success);
 						let new_price = total_price += success.total;
-						let old_products = success.products;
-						let new_products = old_products.concat(_products);
+
+						//Merge products
+						let final_products = mergeProducts(success.products, _products);
+
 						let value = {
-							products: new_products,
+							products: final_products,
 							total: new_price
 						};
 						sails.models.cart.update({user_id: request.body.user_id}, value).then(success => {
@@ -165,8 +169,32 @@ module.exports = {
 					response.status = 400;
 					response.json("no_id_provided");
 			}
-	}
+	},
+
+
 
 
 
 };
+
+//Merge all multiple instances
+function mergeProducts (products1, products2) {
+
+	let new_products = products1.concat(products2);
+	let final_products = [];
+	let sortedArr = toolifier.objects.sortByKey(new_products, 'product_SKU');
+	var current = sortedArr[0];
+	for (var i = 1; i < sortedArr.length; i++) {
+		if (sortedArr[i].product_SKU != current.product_SKU) {
+				final_products.push(current);
+				current = sortedArr[i];
+		} else {
+				current.count += sortedArr[i].count;
+		}
+	}
+	final_products.push(current);
+
+	console.log(final_products);
+
+	return final_products;
+}
