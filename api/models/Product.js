@@ -11,6 +11,11 @@ module.exports = {
     connection: "suits_mongo",
 
     attributes: {
+        product_SKU: {
+            type: "string",
+            unique: true,
+            required: true
+        },
         name: {
             type: "string",
             required: true
