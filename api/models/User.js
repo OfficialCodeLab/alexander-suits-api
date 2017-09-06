@@ -23,6 +23,25 @@ module.exports = {
         contact_mobile: {
             type: "string"
         },
+        address: {
+            type: "string"
+        },
+        address2: {
+            type: "string"
+        },
+        city: {
+            type: "string"
+        },
+        province: {
+            type: "string"
+        },
+        postal_code: {
+            type: "string"
+        },
+        country: {
+            type: "string",
+            defaultsTo: "South Africa"
+        },
         carts: {
             type: "Array",
             defaultsTo: []
@@ -35,6 +54,9 @@ module.exports = {
             type: "string",
             required: true,
             unique: true
+        },
+        status: {
+            type: "string"
         },
     }
 };

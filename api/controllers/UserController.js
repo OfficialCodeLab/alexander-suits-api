@@ -44,15 +44,31 @@ module.exports = {
         })
     },
 
+		updateUser: (request, response) => {
+        console.log("Received POST for UPDATE USER");
+        console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+				// console.log(request.body)
+
+        sails.models.user.update({user_id: request.body.user_id}, request.body).then(success => {
+            console.log("Logging success: ", success);
+            response.json(success);
+        }).catch(ex => {
+            response.statusCode = 400;
+            response.status = 400;
+            response.json(ex);
+        })
+    },
+
 		getUser: (request, response) => {
 
 			console.log("Received POST for GET USER");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 
-			if (request.query.id) {
+			if (request.query.user_id) {
 				let options = {
-					user_id: request.query.id
+					user_id: request.query.user_id
 				};
 
 				sails.models.user.findOne(options).then(success => {
@@ -60,7 +76,7 @@ module.exports = {
 							console.log("Logging success: ", success);
 							response.json(success);
 						} else {
-							response.json("does_not_exist");
+							response.json({status:"does_not_exist"});
 						}
 				}).catch(ex => {
 						response.statusCode = 400;

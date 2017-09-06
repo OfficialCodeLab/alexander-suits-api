@@ -38,6 +38,7 @@ module.exports.routes = {
     'get /api/users/create_force' : 'UserController.trigger', // This is a test route
     'get /api/user' : 'UserController.getUser', // This is a test route
     'post /api/users/create' : 'UserController.createUser',
+    'post /api/users/update' : 'UserController.updateUser',
 
     'post /api/products/create' : 'ProductController.createProduct',
     'get /api/products/all' : 'ProductController.getAll',
