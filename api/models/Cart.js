@@ -9,6 +9,20 @@ module.exports = {
 
     attributes: {
 
+      user_id: {
+          type: "string",
+          required: true,
+          unique: true
+      },
+      products: {
+          type: "Array",
+          defaultsTo: []
+      },
+      total: {
+          type: "integer"
+      },
+      status: {
+          type: "string"
+      },
     }
 };
-

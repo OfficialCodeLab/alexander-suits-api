@@ -43,6 +43,11 @@ module.exports = {
 								let p = {
 									product_SKU: success.id,
 									price: success.price,
+									name: success.name,
+									description: success.description,
+									category: success.category,
+									extras: success.extras,
+									image_urls: success.image_urls,
 									count: product.count
 								};
 								resolve(p);
@@ -69,16 +74,16 @@ module.exports = {
 				}
 				sails.models.cart.findOne({user_id: request.body.user_id}).then(success => {
 					if(success) {	//UPDATE EXISTING
-						// console.log("Found Cart: ", success);
-						let new_price = total_price += success.total;
 
-						//Merge products
+						//Merge products & price
+						let new_price = total_price += success.total;
 						let final_products = mergeProducts(success.products, _products);
 
 						let value = {
 							products: final_products,
 							total: new_price
 						};
+						//Update
 						sails.models.cart.update({user_id: request.body.user_id}, value).then(success => {
 								console.log("Logging success: ", success[0]);
 								response.json(success[0]);
@@ -113,7 +118,7 @@ module.exports = {
 
 	getCart: (request, response) => {
 
-		console.log("Received POST for GET CART");
+		console.log("Received GET for GET CART");
 		console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 
@@ -155,7 +160,7 @@ module.exports = {
 				sails.models.cart.destroy(options).then(success => {
 						if(success) {
 							console.log("Logging success: ", success);
-							response.json("successful");
+							response.json("success");
 						} else {
 							response.json("does_not_exist");
 						}
@@ -193,8 +198,6 @@ function mergeProducts (products1, products2) {
 		}
 	}
 	final_products.push(current);
-
-	console.log(final_products);
 
 	return final_products;
 }
