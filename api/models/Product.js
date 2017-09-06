@@ -34,7 +34,9 @@ module.exports = {
         image_urls: {
             type: "Array",
             defaultsTo: []
+        },
+        estimated_stock_remaining: {
+            type: "integer"
         }
     }
 };
-
