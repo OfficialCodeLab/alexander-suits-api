@@ -199,5 +199,12 @@ function mergeProducts (products1, products2) {
 	}
 	final_products.push(current);
 
-	return final_products;
+	let final = [];
+	for(let product of final_products) {
+		if(product.count != 0) {
+			final.push(product);
+		}
+	}
+
+	return final.reverse();
 }
