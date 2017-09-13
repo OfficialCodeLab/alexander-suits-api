@@ -65,6 +65,7 @@ module.exports = {
 
 			console.log("Received POST for GET USER");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+			console.log("From: " + request.headers.origin);
 
 
 			if (request.query.user_id) {

@@ -26,6 +26,7 @@ module.exports = {
     getAll: (request, response) => {
         console.log("Received GET for All Products");
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+  			console.log("From: " + request.headers.origin);
 
         // let options = {};
         // if (request.params) {

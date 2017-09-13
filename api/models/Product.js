@@ -33,7 +33,7 @@ module.exports = {
             required: true
         },
         extras: {
-            type: "object",
+            type: "json",
             defaultsTo: {}
         },
         image_urls: {
