@@ -28,13 +28,32 @@ module.exports.policies = {
 
   // '*': true,
 
+  UserController: {
+    createUser: 'isAuthenticated',
+    getUser: 'isAuthenticated'
+  },
+  
   ProductController: {
     createProduct: 'isAuthenticated'
   },
 
-  UserController: {
-    createUser: 'isAuthenticated',
-    getUser: 'isAuthenticated'
+  CartController: {
+    getCart: 'isAuthenticated',
+    updateCart: 'isAuthenticated',
+    createCart: 'isAuthenticated',
+    deleteCart: 'isAuthenticated'
+  },
+
+  OrderController: {
+    getOrder: 'isAuthenticated',
+    getAllUserOrder: 'isAuthenticated',
+    getAll: 'isAuthenticated',
+    createOrder: 'isAuthenticated',
+    updateOrder: 'isAuthenticated'
+  },
+
+  TransactionController: {
+    updateTransaction: 'isAuthenticated'
   },
 
 

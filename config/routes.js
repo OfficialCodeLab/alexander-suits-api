@@ -35,20 +35,31 @@ module.exports.routes = {
     '/': {
         view: 'homepage'
     },
+    //USER
     'get /api/users/create_force' : 'UserController.trigger', // This is a test route
-    'get /api/user' : 'UserController.getUser', // This is a test route
+    'get /api/user' : 'UserController.getUser',
     'post /api/users/create' : 'UserController.createUser',
     'post /api/users/update' : 'UserController.updateUser',
 
+    //PRODUCTS
     'post /api/products/create' : 'ProductController.createProduct',
     'get /api/products/all' : 'ProductController.getAll',
 
-
+    //CART
     'get /api/cart' : 'CartController.getCart',
     'post /api/cart/update' : 'CartController.updateCart',
     'get /api/cart/create' : 'CartController.createCart',
     'delete /api/cart/delete' : 'CartController.deleteCart',
 
+    //ORDER
+    'get /api/order' : 'OrderController.getOrder',
+    'get /api/orders' : 'OrderController.getAllUserOrder',
+    'get /api/order/all' : 'OrderController.getAll',
+    'post /api/order/create' : 'OrderController.createOrder',
+    'post /api/order/update' : 'OrderController.updateOrder',
+
+    //TRANSACTION
+    'post /api/transaction' : 'TransactionController.updateTransaction',
     /***************************************************************************
      *                                                                          *
      * Custom routes here...                                                    *

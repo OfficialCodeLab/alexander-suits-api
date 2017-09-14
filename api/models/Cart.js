@@ -7,6 +7,9 @@
 
 module.exports = {
 
+    tableName: "carts",
+    connection: "suits_mongo",
+    
     attributes: {
 
       user_id: {

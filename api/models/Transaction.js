@@ -7,6 +7,8 @@
 
 module.exports = {
 
+  tableName: "transactions",
+  connection: "suits_mongo",
   attributes: {
     id: {
         type: "string",
@@ -28,7 +30,7 @@ module.exports = {
     reference: {
         type: "string"
     },
-    currency_code {
+    currency_code: {
         type: "string"
     },
     additional_info: {

@@ -7,6 +7,8 @@
 
 module.exports = {
 
+  tableName: "orders",
+  connection: "suits_mongo",
   attributes: {
     user_id: {
         type: "string",
@@ -24,16 +26,20 @@ module.exports = {
         type: "json",
         defaultsTo: {}
     },
-    transaction_id {
+    transaction_id: {
         type: "string"
     },
     user_data: {
         type: "json",
         defaultsTo: {}
     },
+    delivery: {
+        type: "json",
+        defaultsTo: {}
+    },
     address_data: {
-        type: "Array",
-        defaultsTo: []
+        type: "json",
+        defaultsTo: {}
     },
     contact_number: {
       type: "string",

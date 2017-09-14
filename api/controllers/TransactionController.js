@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-	paymentUpdate:  (request, response) => {
+	updateTransaction:  (request, response) => {
 
 			console.log("Received POST for UPDATE PAYMENT");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
@@ -16,7 +16,7 @@ module.exports = {
 			//Check for existing payments in DB
 			sails.models.transaction.findOne({id: id}).then(success => {
 					let order_data = {
-						status = payment_data.status.state //This is addPay only
+						status: payment_data.status.state //This is addPay only
 					};
 					if(success) {
 						// console.log("Logging success: ", success);
@@ -61,7 +61,7 @@ module.exports = {
 };
 
 function updateOrder(order, order_data) {
-	return new Promise((resolve, reject) = {
+	return new Promise((resolve, reject) => {
 		sails.models.order.update(order, order_data).then(o => {
 				resolve(o);
 		}).catch(e => {

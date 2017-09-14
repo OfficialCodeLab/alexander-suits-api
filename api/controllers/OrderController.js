@@ -22,7 +22,7 @@ module.exports = {
 						cart_data.status = "Payment Pending";
 
 						//Create order
-						sails.models.order.create(cart_data).then(order => {
+						sails.models.order.create(cart_data).then(order => {							
 								console.log("Logging success: ", order);
 								response.json(order);
 						}).catch(e => {
@@ -102,7 +102,7 @@ module.exports = {
 
 	},
 
-	getAllOrder: (request, response) => {
+	getAll: (request, response) => {
 
 			console.log("Received GET for GET ALL ORDERS");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
@@ -161,7 +161,7 @@ module.exports = {
 };
 
 function updateOrder(order, order_data) {
-	return new Promise((resolve, reject) = {
+	return new Promise((resolve, reject) => {
 		sails.models.order.update(order, order_data).then(o => {
 				resolve(o);
 		}).catch(e => {
@@ -171,7 +171,7 @@ function updateOrder(order, order_data) {
 }
 
 function addTransaction(transaction_data) {
-	return new Promise((resolve, reject) = {
+	return new Promise((resolve, reject) => {
 		//Create transaction
 		mails.model.transaction.create(transaction_data).then(transaction => {
 				resolve(transaction);
