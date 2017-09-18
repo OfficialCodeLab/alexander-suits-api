@@ -22,9 +22,9 @@ module.exports = {
   // },
 
   ssl: {
-    ca: require('fs').readFileSync('~/../etc/letsencrypt/live/as.api.pear-cap.com/chain.pem'),
-    key: require('fs').readFileSync('~/../etc/letsencrypt/live/as.api.pear-cap.com/privkey.pem'),
-    cert: require('fs').readFileSync('~/../etc/letsencrypt/live/as.api.pear-cap.com/cert.pem')
+    ca: require('fs').readFileSync('/etc/letsencrypt/live/as.api.pear-cap.com/chain.pem'),
+    key: require('fs').readFileSync('/etc/letsencrypt/live/as.api.pear-cap.com/privkey.pem'),
+    cert: require('fs').readFileSync('/etc/letsencrypt/live/as.api.pear-cap.com/cert.pem')
   },
 
   /***************************************************************************
