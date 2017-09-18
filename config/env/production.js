@@ -25,7 +25,7 @@ module.exports = {
     // ca: require('fs').readFileSync(require('path').resolve(__dirname,'../ssl/my-gd-bundle.crt')),
     key: require('fs').readFileSync(require('path').resolve(__dirname,'../../secrets/apache-selfsigned.key')),
     cert: require('fs').readFileSync(require('path').resolve(__dirname,'../../secrets/apache-selfsigned.crt'))
-  }
+  },
 
   /***************************************************************************
    * Set the port in the production environment to 80                        *
