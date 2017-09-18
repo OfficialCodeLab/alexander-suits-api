@@ -22,9 +22,9 @@ module.exports = {
   // },
 
   ssl: {
-    // ca: require('fs').readFileSync(require('path').resolve(__dirname,'../ssl/my-gd-bundle.crt')),
-    key: require('fs').readFileSync(require('path').resolve(__dirname,'../../secrets/apache-selfsigned.key')),
-    cert: require('fs').readFileSync(require('path').resolve(__dirname,'../../secrets/apache-selfsigned.crt'))
+    ca: require('fs').readFileSync('~/../etc/letsencrypt/live/as.api.pear-cap.com/chain.pem'),
+    key: require('fs').readFileSync('~/../etc/letsencrypt/live/as.api.pear-cap.com/privkey.pem'),
+    cert: require('fs').readFileSync('~/../etc/letsencrypt/live/as.api.pear-cap.com/cert.pem')
   },
 
   /***************************************************************************
