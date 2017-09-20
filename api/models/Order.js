@@ -16,8 +16,6 @@ module.exports = {
     },
     order_number: {
         type: 'integer',
-        unique: true,
-        autoIncrement: true
     },
     order_string: {
         type: 'string'
@@ -68,5 +66,19 @@ module.exports = {
         type: "json",
         defaultsTo: {}
     }
-  }
+  },
+
+  beforeCreate: function(obj, next){
+    Order.count().exec(function(err, cnt){
+        if(err) next(err);
+        else{
+            let on = cnt + 1;
+            let nm = 1040 + on;
+            obj['order_number'] = nm;
+            obj['order_string'] = "ORD_00" + nm;
+            next(null);
+        }
+    })
+}
+
 };
