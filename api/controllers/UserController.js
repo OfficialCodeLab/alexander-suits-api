@@ -92,5 +92,26 @@ module.exports = {
 			}
 
 
-		}
+		},
+
+		getAll: (request, response) => {
+
+				console.log("Received GET for GET ALL USERS");
+				console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+				sails.models.user.find().then(success => {
+						if(success) {
+							console.log("Logging success: ", success);
+							response.json(success);
+						} else {
+							response.json({status:"does_not_exist"});
+						}
+				}).catch(ex => {
+						response.statusCode = 400;
+						response.status = 400;
+						response.json(ex);
+				})
+
+
+		},
 };

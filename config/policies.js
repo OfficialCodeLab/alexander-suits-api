@@ -30,9 +30,10 @@ module.exports.policies = {
 
   UserController: {
     createUser: 'isAuthenticated',
-    getUser: 'isAuthenticated'
+    getUser: 'isAuthenticated',    
+    getUsers: 'isAuthenticated'
   },
-  
+
   ProductController: {
     createProduct: 'isAuthenticated'
   },
