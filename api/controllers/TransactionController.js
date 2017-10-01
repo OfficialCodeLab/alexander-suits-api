@@ -39,7 +39,7 @@ module.exports = {
 
 						// console.log("Logging success: ", success);
 						// response.json(success);
-						updateOrder({transaction_id: order_string}, order_data).then(order=> {
+						updateOrder({transaction_id: id}, order_data).then(order=> {
 								if(!!order && order.length > 0) {
 									console.log("Logging success: ", order);
 									response.statusCode = 200;
@@ -70,7 +70,7 @@ module.exports = {
 								console.log(id);
 
 								//Update order
-								updateOrder({transaction_id: order_string}, order_data).then(order=>{
+								updateOrder({transaction_id: id}, order_data).then(order=>{
 									if(!!order) {
 										//success
 										console.log("Logging success: ", o);
@@ -191,7 +191,7 @@ module.exports = {
 					// console.log(response);
 			    // sails.log.info(res);
 			    // sails.log.info(body);
-					updateOrder({order_string: order_string}, {transaction_id: res.body.id}).then(order=>{
+					updateOrder({order_string:  request.body.order_string}, {transaction_id: res.body.id}).then(order=>{
 						if(!!order) {
 							//success
 							response.json(res.body);
