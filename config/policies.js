@@ -30,7 +30,7 @@ module.exports.policies = {
 
   UserController: {
     createUser: 'isAuthenticated',
-    getUser: 'isAuthenticated',    
+    getUser: 'isAuthenticated',
     getUsers: 'isAuthenticated'
   },
 
@@ -54,7 +54,9 @@ module.exports.policies = {
   },
 
   TransactionController: {
-    updateTransaction: 'isAuthenticated'
+    // updateTransaction: 'isAuthenticated',
+    createTransaction: 'isAuthenticated',
+    getPaymentOptions: 'isAuthenticated'
   },
 
 

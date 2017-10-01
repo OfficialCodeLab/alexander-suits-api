@@ -60,7 +60,9 @@ module.exports.routes = {
     'post /api/order/update' : 'OrderController.updateOrder',
 
     //TRANSACTION
-    'post /api/transaction' : 'TransactionController.updateTransaction',
+    'get /api/transactions/paymentOptions' : 'TransactionController.getPaymentOptions',
+    'post /api/transactions/new' : 'TransactionController.createTransaction',
+    'post /api/transactions/update' : 'TransactionController.updateTransaction',
     /***************************************************************************
      *                                                                          *
      * Custom routes here...                                                    *
