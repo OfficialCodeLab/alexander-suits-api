@@ -68,25 +68,44 @@ module.exports = {
 								order_data.transaction_id = id;
 
 								//Update order
-								updateOrder({order_string: id}, order_data).then(order=> {
-										if(!!order && order.length > 0) {
-											console.log("Logging success: ", order);
-											response.statusCode = 200;
-											response.status = 200;
-											response.json("kthnxbye");
-										} else {
-											console.log("No order found");
-											response.statusCode = 400;
-											response.status = 400;
-											response.json("No order found");
-										}
-										//Email user with transaction processing
+								sails.models.order.update({order_string: id}, order_data).then(order => {
+									if(!!order && order.length > 0) {
+										console.log("Logging success: ", order);
+										response.statusCode = 200;
+										response.status = 200;
+										response.json("kthnxbye");
+									} else {
+										console.log("No order found");
+										response.statusCode = 400;
+										response.status = 400;
+										response.json("No order found");
+									}
 								}).catch(e => {
+
 										console.log(e);
 										response.statusCode = 400;
 										response.status = 400;
 										response.json(e);
 								})
+								// updateOrder({order_string: id}, order_data).then(order=> {
+								// 		if(!!order && order.length > 0) {
+								// 			console.log("Logging success: ", order);
+								// 			response.statusCode = 200;
+								// 			response.status = 200;
+								// 			response.json("kthnxbye");
+								// 		} else {
+								// 			console.log("No order found");
+								// 			response.statusCode = 400;
+								// 			response.status = 400;
+								// 			response.json("No order found");
+								// 		}
+								// 		//Email user with transaction processing
+								// }).catch(e => {
+								// 		console.log(e);
+								// 		response.statusCode = 400;
+								// 		response.status = 400;
+								// 		response.json(e);
+								// })
 						}).catch(exc => {
 								console.log(exc);
 								response.statusCode = 400;
