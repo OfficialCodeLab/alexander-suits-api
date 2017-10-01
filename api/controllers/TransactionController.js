@@ -16,7 +16,7 @@ module.exports = {
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 			let payment_data = request.body; //update this later
-			let id = payment_data.reference; //update this later
+			let id = payment_data.id; //update this later
 			console.log(payment_data);
 			// Check for existing payments in DB
 			sails.models.transaction.findOne({id: id}).then(success => {
@@ -81,10 +81,14 @@ module.exports = {
 										console.log("No order found");
 										response.statusCode = 400;
 										response.status = 400;
-										//response.json(res.body);
+										response.json("No order found");
 									}
 
 								}).catch(ex=>{
+									console.log(ex);
+									response.statusCode = 400;
+									response.status = 400;
+									response.json(ex);
 									//error
 								})
 
@@ -194,6 +198,7 @@ module.exports = {
 					updateOrder({order_string:  request.body.order_string}, {transaction_id: res.body.id}).then(order=>{
 						if(!!order) {
 							//success
+							console.log("Logging success: ", order);
 							response.json(res.body);
 						} else {
 							//response.json(res.body);
