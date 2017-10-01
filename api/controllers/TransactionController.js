@@ -68,25 +68,34 @@ module.exports = {
 								order_data.transaction_id = id;
 
 								//Update order
-								sails.models.order.update({order_string: id}, order_data).then(order => {
-									if(!!order && order.length > 0) {
-										console.log("Logging success: ", order);
-										response.statusCode = 200;
-										response.status = 200;
-										response.json("kthnxbye");
-									} else {
-										console.log("No order found");
-										response.statusCode = 400;
-										response.status = 400;
-										response.json("No order found");
-									}
-								}).catch(e => {
+								sails.models.order.findOne({order_string: id}).then(order=>{
+									sails.models.order.update({id: order.id}, order_data).then(o => {
+										if(!!o) {
+											console.log("Logging success: ", o);
+											response.statusCode = 200;
+											response.status = 200;
+											response.json("kthnxbye");
+										} else {
+											console.log("No order found");
+											response.statusCode = 400;
+											response.status = 400;
+											response.json("No order found");
+										}
+									}).catch(e => {
 
-										console.log(e);
+											console.log(e);
+											response.statusCode = 400;
+											response.status = 400;
+											response.json(e);
+									})
+								}).catch(ex => {
+
+										console.log(ex);
 										response.statusCode = 400;
 										response.status = 400;
-										response.json(e);
+										response.json(ex);
 								})
+
 								// updateOrder({order_string: id}, order_data).then(order=> {
 								// 		if(!!order && order.length > 0) {
 								// 			console.log("Logging success: ", order);
