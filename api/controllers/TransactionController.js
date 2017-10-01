@@ -52,7 +52,7 @@ module.exports = {
 					} else {
 						//Handle in future?
 						sails.model.transaction.create(payment_data).then(transaction => {
-								cart_data.transaction_data = payment_data;
+								// cart_data.transaction_data = payment_data;
 
 								//Update order
 								updateOrder({order_string: payment_data.id}, order_data).then(order=> {
