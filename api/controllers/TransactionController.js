@@ -32,12 +32,13 @@ module.exports = {
 						};
 					}
 					if(!!success) {
+						console.log("transaction exists");
 						//TODO: update transaction in db first
 
 						// console.log("Logging success: ", success);
 						// response.json(success);
 						updateOrder({order_string: id}, order_data).then(order=> {
-								if(!!order) {
+								if(!!order && order.length > 0) {
 									console.log("Logging success: ", order);
 									response.statusCode = 200;
 									response.status = 200;
@@ -58,14 +59,17 @@ module.exports = {
 						})
 					} else {
 						//Handle in future?
+							console.log("transaction does not exist");
 						sails.models.transaction.create(payment_data).then(transaction => {
+
+								console.log("transaction exists now");
 								// cart_data.transaction_data = payment_data;
 								order_data.transaction_data = payment_data;
-								order_data.transaction_id = payment_data.id;
+								order_data.transaction_id = id;
 
 								//Update order
 								updateOrder({order_string: id}, order_data).then(order=> {
-										if(!!order) {
+										if(!!order && order.length > 0) {
 											console.log("Logging success: ", order);
 											response.statusCode = 200;
 											response.status = 200;
