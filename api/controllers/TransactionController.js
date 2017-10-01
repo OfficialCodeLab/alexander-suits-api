@@ -16,54 +16,65 @@ module.exports = {
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 			let payment_data = request.body; //update this later
-			let id = payment_data.id; //update this later
-			console.log(payment_data);
-			response.statusCode = 200;
-			response.status = 200;
-			response.json("kthnxbye");
-			//Check for existing payments in DB
-			// sails.models.transaction.findOne({id: id}).then(success => {
-			// 		let order_data = {
-			// 			status: payment_data.status.state //This is addPay only
-			// 		};
-			// 		if(success) {
-			// 			// console.log("Logging success: ", success);
-			// 			// response.json(success);
-			// 			updateOrder({transaction_id: id}, order_data).then(order=> {
-			// 					console.log("Logging success: ", order);
-			// 					response.json(order);
-			// 					//Email user with transaction processing
-			// 			}).catch(e => {
-			// 					response.statusCode = 400;
-			// 					response.status = 400;
-			// 					response.json(e);
-			// 			})
-			// 		} else {
-			// 			//Handle in future?
-			// 			mails.model.transaction.create(payment_data).then(transaction => {
-			// 					cart_data.transaction_data = transaction_data;
-			//
-			// 					//Update order
-			// 					updateOrder(order_data).then(order=> {
-			// 							console.log("Logging success: ", order);
-			// 							response.json(order);
-			// 							//Email user with transaction processing
-			// 					}).catch(e => {
-			// 							response.statusCode = 400;
-			// 							response.status = 400;
-			// 							response.json(e);
-			// 					})
-			// 			}).catch(exc => {
-			// 					response.statusCode = 400;
-			// 					response.status = 400;
-			// 					response.json(exc);
-			// 			})
-			// 		}
-			// }).catch(ex => {
-			// 		response.statusCode = 400;
-			// 		response.status = 400;
-			// 		response.json(ex);
-			// })
+			let id = payment_data.reference; //update this later
+			// console.log(payment_data);
+			// Check for existing payments in DB
+			sails.models.transaction.findOne({id: id}).then(success => {
+					let order_data;
+					if (payment_data.status === 0) {
+						order_data = {
+							status: "processed"
+						};
+					} else {
+						order_data = {
+							status: payment_data.status.state //This is addPay only
+						};
+					}
+					if(success) {
+						//TODO: update transaction in db first
+
+						// console.log("Logging success: ", success);
+						// response.json(success);
+						updateOrder({order_string: payment_data.id}, order_data).then(order=> {
+								console.log("Logging success: ", order);
+								response.statusCode = 200;
+								response.status = 200;
+								response.json("kthnxbye");
+								// response.json(order);
+								//Email user with transaction processing
+						}).catch(e => {
+								response.statusCode = 400;
+								response.status = 400;
+								response.json(e);
+						})
+					} else {
+						//Handle in future?
+						mails.model.transaction.create(payment_data).then(transaction => {
+								cart_data.transaction_data = payment_data;
+
+								//Update order
+								updateOrder({order_string: payment_data.id}, order_data).then(order=> {
+										console.log("Logging success: ", order);
+										response.statusCode = 200;
+										response.status = 200;
+										response.json("kthnxbye");
+										//Email user with transaction processing
+								}).catch(e => {
+										response.statusCode = 400;
+										response.status = 400;
+										response.json(e);
+								})
+						}).catch(exc => {
+								response.statusCode = 400;
+								response.status = 400;
+								response.json(exc);
+						})
+					}
+			}).catch(ex => {
+					response.statusCode = 400;
+					response.status = 400;
+					response.json(ex);
+			})
 
 	},
 
@@ -96,8 +107,8 @@ module.exports = {
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 			let postBody = {
-				"method": "standard_card",
-			  "reference": "MyFirstPaymentRequest",
+				"method": request.body.method,
+			  "reference": request.body.order_string,
 			  "description": "I am testing the AddPay API",
 			  "payer": {
 			    "firstname": "John",
@@ -110,7 +121,7 @@ module.exports = {
 			  },
 			  "app": {
 			    "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
-			    "return_url": "http://localhost:4200/"
+			    "return_url": "http://localhost:4200/payment"
 			  },
 			  "api": {
 			    "mode": "test"
@@ -134,7 +145,7 @@ module.exports = {
 					// console.log(response);
 			    // sails.log.info(res);
 			    // sails.log.info(body);
-					response.json(res);
+					response.json(res.body);
 			  }
 			});
 
