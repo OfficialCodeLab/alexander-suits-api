@@ -40,11 +40,11 @@ module.exports = {
 						// console.log("Logging success: ", success);
 						// response.json(success);
 						updateOrder({transaction_id: id}, order_data).then(order=> {
-								if(!!order && order.length > 0) {
-									console.log("Logging success: ", order);
+								if(!!order) {
 									response.statusCode = 200;
 									response.status = 200;
 									response.json("kthnxbye");
+									//Email user with transaction processing
 								} else {
 									console.log("No order found");
 									response.statusCode = 400;
@@ -52,7 +52,6 @@ module.exports = {
 									response.json("No order found");
 								}
 								// response.json(order);
-								//Email user with transaction processing
 						}).catch(e => {
 								console.log(e);
 								response.statusCode = 400;
@@ -61,10 +60,10 @@ module.exports = {
 						})
 					} else {
 						//Handle in future?
-							console.log("transaction does not exist");
+							// console.log("transaction does not exist");
 						sails.models.transaction.create(payment_data).then(transaction => {
 
-								console.log("transaction exists now");
+								// console.log("transaction exists now");
 								// cart_data.transaction_data = payment_data;
 								// order_data.transaction_data = payment_data;
 								console.log(id);
@@ -73,10 +72,11 @@ module.exports = {
 								updateOrder({transaction_id: id}, order_data).then(order=>{
 									if(!!order) {
 										//success
-										console.log("Logging success: ", o);
+										// console.log("Logging success: ", order);
 										response.statusCode = 200;
 										response.status = 200;
 										response.json("kthnxbye");
+										//Email user with transaction processing
 									} else {
 										console.log("No order found");
 										response.statusCode = 400;
@@ -90,28 +90,7 @@ module.exports = {
 									response.status = 400;
 									response.json(ex);
 									//error
-								})
-
-
-								// updateOrder({order_string: id}, order_data).then(order=> {
-								// 		if(!!order && order.length > 0) {
-								// 			console.log("Logging success: ", order);
-								// 			response.statusCode = 200;
-								// 			response.status = 200;
-								// 			response.json("kthnxbye");
-								// 		} else {
-								// 			console.log("No order found");
-								// 			response.statusCode = 400;
-								// 			response.status = 400;
-								// 			response.json("No order found");
-								// 		}
-								// 		//Email user with transaction processing
-								// }).catch(e => {
-								// 		console.log(e);
-								// 		response.statusCode = 400;
-								// 		response.status = 400;
-								// 		response.json(e);
-								// })
+								});
 						}).catch(exc => {
 								console.log(exc);
 								response.statusCode = 400;
@@ -142,9 +121,6 @@ module.exports = {
 			    sails.log.error(error);
 			  }
 			  else {
-					// console.log(response);
-			    // sails.log.info(res);
-			    // sails.log.info(body);
 					response.json(res.body);
 			  }
 			});
@@ -155,59 +131,74 @@ module.exports = {
 
 			console.log("Received POST for CREATE PAYMENT");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+			sails.models.order.findOne({order_string: request.body.order_string}).then(or=>{
+				if(or.status === "processed" || or.status === "in_progress" || or.status === "shipped" || or.status === "completed" || or.status === "cancelled_final") {
+					response.statusCode = 400;
+					response.status = 400;
+					response.json("Order already processed");
+				} else {
+						let names = or.user_data.name.split(' ');
+						let postBody = {
+							"method": request.body.method,
+						  "reference": request.body.order_string,
+						  "description": "Alexander Suits Payment",
+						  "payer": {
+						    "firstname": names[0],
+						    "lastname": names[names.length -1],
+						    "email": or.contact_email
+						  },
+						  "amount": {
+						    "currency": "ZAR",
+						    "value": or.total
+						  },
+						  "app": {
+						    "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
+						    "return_url": "http://localhost:4200/payment"
+						  },
+						  "api": {
+						    "mode": "test"
+						  }
+						};
 
-			let postBody = {
-				"method": request.body.method,
-			  "reference": request.body.order_string,
-			  "description": "I am testing the AddPay API",
-			  "payer": {
-			    "firstname": "John",
-			    "lastname": "Doe",
-			    "email": "johndoe@example.org"
-			  },
-			  "amount": {
-			    "currency": "ZAR",
-			    "value": "1.50"
-			  },
-			  "app": {
-			    "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
-			    "return_url": "http://localhost:4200/payment"
-			  },
-			  "api": {
-			    "mode": "test"
-			  }
-			};
+						// console.log(JSON.stringify(postBody));
 
-			//console.log(JSON.stringify(postBody));
+						req.post({
+						  url: 'https://api.addpay.co.za/v1/transactions',
+							methods: 'POST',
+							headers: {'X-APP-ID': secrets.addPay.app_id, 'X-APP-SECRET': secrets.addPay.app_secret},
+							json: true,
+							body: postBody
+						}, function(error, res, body) {
+						  if (error) {
+						    sails.log.error(error);
+						  }
+						  else {
+								updateOrder({order_string:  request.body.order_string}, {transaction_id: res.body.id}).then(order=>{
+									if(!!order) {
+										//success
+										// console.log("Logging success: ", order);
+										response.json(res.body);
+									} else {
+										response.statusCode = 400;
+										response.status = 400;
+										response.json("No order found");
+									}
+								}).catch(ex=>{
+									//error
+									console.log("HMM", ex);
+									response.statusCode = 400;
+									response.status = 400;
+									response.json(ex);
+								});
+						  }
+						});
+				}
 
-			req.post({
-			  url: 'https://api.addpay.co.za/v1/transactions',
-				methods: 'POST',
-				headers: {'X-APP-ID': secrets.addPay.app_id, 'X-APP-SECRET': secrets.addPay.app_secret},
-				json: true,
-				body: postBody
-			}, function(error, res, body) {
-			  if (error) {
-			    sails.log.error(error);
-			  }
-			  else {
-					// body.push(bodyData);
-					// console.log(response);
-			    // sails.log.info(res);
-			    // sails.log.info(body);
-					updateOrder({order_string:  request.body.order_string}, {transaction_id: res.body.id}).then(order=>{
-						if(!!order) {
-							//success
-							console.log("Logging success: ", order);
-							response.json(res.body);
-						} else {
-							//response.json(res.body);
-						}
-
-					}).catch(ex=>{
-						//error
-					})
-			  }
+			}).catch(e => {
+				console.log("WUT", e);
+				response.statusCode = 400;
+				response.status = 400;
+				response.json(e);
 			});
 
 	},

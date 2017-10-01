@@ -54,7 +54,8 @@ module.exports = {
         defaultsTo: []
     },
     total: {
-        type: "integer"
+        type: "float",
+        decimal2: true
     },
     status: {
         type: "string"
@@ -65,6 +66,11 @@ module.exports = {
     agent_data: {
         type: "json",
         defaultsTo: {}
+    }
+  },
+  types: {
+    decimal2: function(number){
+      return ((number *100)%1 === 0);
     }
   },
 

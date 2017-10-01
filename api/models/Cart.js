@@ -9,7 +9,7 @@ module.exports = {
 
     tableName: "carts",
     connection: "suits_mongo",
-    
+
     attributes: {
 
       user_id: {
@@ -22,10 +22,17 @@ module.exports = {
           defaultsTo: []
       },
       total: {
-          type: "integer"
+          type: "float",
+          decimal2: true
       },
       status: {
           type: "string"
       },
-    }
+    },
+
+    types: {
+      decimal2: function(number){
+        return ((number *100)%1 === 0);
+      }
+    },
 };

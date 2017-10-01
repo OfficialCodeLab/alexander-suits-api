@@ -29,7 +29,8 @@ module.exports = {
             required: true
         },
         price: {
-            type: "integer",
+            type: "float",
+            decimal2: true,
             required: true
         },
         extras: {
@@ -43,5 +44,10 @@ module.exports = {
         estimated_stock_remaining: {
             type: "integer"
         }
-    }
+    },
+    types: {
+      decimal2: function(number){
+        return ((number *100)%1 === 0);
+      }
+    },
 };

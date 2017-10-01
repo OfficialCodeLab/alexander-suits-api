@@ -25,7 +25,8 @@ module.exports = {
         type: "string"
     },
     amount: {
-        type: "double"
+        type: "float",
+        decimal2: true
     },
     reference: {
         type: "string"
@@ -36,6 +37,12 @@ module.exports = {
     additional_info: {
         type: "json",
         defaultsTo: {}
+    },
+
+  },
+  types: {
+    decimal2: function(number){
+      return ((number *100)%1 === 0);
     }
-  }
+  },
 };
