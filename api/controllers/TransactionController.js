@@ -17,9 +17,10 @@ module.exports = {
 
 			let payment_data = request.body; //update this later
 			let id = payment_data.reference; //update this later
-			// console.log(payment_data);
+			console.log(payment_data);
 			// Check for existing payments in DB
 			sails.models.transaction.findOne({id: id}).then(success => {
+					console.log("?");
 					let order_data;
 					if (payment_data.status === 0) {
 						order_data = {
@@ -30,7 +31,7 @@ module.exports = {
 							status: payment_data.status.state //This is addPay only
 						};
 					}
-					if(success) {
+					if(!!success) {
 						//TODO: update transaction in db first
 
 						// console.log("Logging success: ", success);
@@ -43,6 +44,7 @@ module.exports = {
 								// response.json(order);
 								//Email user with transaction processing
 						}).catch(e => {
+								console.log(e);
 								response.statusCode = 400;
 								response.status = 400;
 								response.json(e);
@@ -60,17 +62,20 @@ module.exports = {
 										response.json("kthnxbye");
 										//Email user with transaction processing
 								}).catch(e => {
+										console.log(e);
 										response.statusCode = 400;
 										response.status = 400;
 										response.json(e);
 								})
 						}).catch(exc => {
+								console.log(exc);
 								response.statusCode = 400;
 								response.status = 400;
 								response.json(exc);
 						})
 					}
 			}).catch(ex => {
+					console.log(ex);
 					response.statusCode = 400;
 					response.status = 400;
 					response.json(ex);
