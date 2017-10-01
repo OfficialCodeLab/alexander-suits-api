@@ -18,6 +18,9 @@ module.exports = {
 			let payment_data = request.body; //update this later
 			let id = payment_data.id; //update this later
 			console.log(payment_data);
+			response.statusCode = 200;
+			response.status = 200;
+			response.json("kthnxbye");
 			//Check for existing payments in DB
 			// sails.models.transaction.findOne({id: id}).then(success => {
 			// 		let order_data = {
