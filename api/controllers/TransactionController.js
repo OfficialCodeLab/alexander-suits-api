@@ -51,7 +51,7 @@ module.exports = {
 						})
 					} else {
 						//Handle in future?
-						mails.model.transaction.create(payment_data).then(transaction => {
+						sails.model.transaction.create(payment_data).then(transaction => {
 								cart_data.transaction_data = payment_data;
 
 								//Update order
