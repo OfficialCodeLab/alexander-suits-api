@@ -64,11 +64,18 @@ module.exports = {
 								order_data.transaction_id = payment_data.id;
 
 								//Update order
-								updateOrder({order_string: payment_data.id}, order_data).then(order=> {
-										console.log("Logging success: ", order);
-										response.statusCode = 200;
-										response.status = 200;
-										response.json("kthnxbye");
+								updateOrder({order_string: id}, order_data).then(order=> {
+										if(!!order) {
+											console.log("Logging success: ", order);
+											response.statusCode = 200;
+											response.status = 200;
+											response.json("kthnxbye");
+										} else {
+											console.log("No order found");
+											response.statusCode = 400;
+											response.status = 400;
+											response.json("No order found");
+										}
 										//Email user with transaction processing
 								}).catch(e => {
 										console.log(e);
