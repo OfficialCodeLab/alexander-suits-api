@@ -14,13 +14,14 @@ module.exports = {
 
 			console.log("Received POST for UPDATE PAYMENT");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+			console.log("FROM: " + request.headers.origin);
 
 			let payment_data = request.body; //update this later
 			let id = payment_data.id; //update this later
-			console.log(payment_data);
+			// console.log(payment_data);
 			// Check for existing payments in DB
 			sails.models.transaction.findOne({id: id}).then(success => {
-					console.log("?");
+					// console.log("?");
 					let order_data;
 					if (payment_data.status === 0) {
 						order_data = {
@@ -34,13 +35,16 @@ module.exports = {
 						};
 					}
 					if(!!success) {
-						console.log("transaction exists");
+						// console.log("transaction exists");
 						//TODO: update transaction in db first
 
 						// console.log("Logging success: ", success);
 						// response.json(success);
 						updateOrder({transaction_id: id}, order_data).then(order=> {
 								if(!!order) {
+									if(order.status === "processed") {
+										this.completeOrder();
+									}
 									response.statusCode = 200;
 									response.status = 200;
 									response.json("kthnxbye");
@@ -71,6 +75,9 @@ module.exports = {
 								//Update order
 								updateOrder({transaction_id: id}, order_data).then(order=>{
 									if(!!order) {
+										if(order.status === "processed") {
+											this.completeOrder();
+										}
 										//success
 										// console.log("Logging success: ", order);
 										response.statusCode = 200;
@@ -153,7 +160,7 @@ module.exports = {
 						  },
 						  "app": {
 						    "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
-						    "return_url": "http://localhost:4200/payment"
+						    "return_url": request.headers.origin + "payment"
 						  },
 						  "api": {
 						    "mode": "test"
@@ -214,4 +221,11 @@ function updateOrder(order, order_data) {
 				reject(e);
 		})
 	});
+}
+
+function completeOrder(order) {
+	return new Promise((resolve, reject) => {
+		resolve(true);
+	});
+	//complete order here
 }
