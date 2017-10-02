@@ -138,6 +138,7 @@ module.exports = {
 
 			console.log("Received POST for CREATE PAYMENT");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+			console.log("Return URL: " + request.headers.origin + "/payment");
 			sails.models.order.findOne({order_string: request.body.order_string}).then(or=>{
 				if(or.status === "processed" || or.status === "in_progress" || or.status === "shipped" || or.status === "completed" || or.status === "cancelled_final") {
 					response.statusCode = 400;
@@ -160,7 +161,7 @@ module.exports = {
 						  },
 						  "app": {
 						    "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
-						    "return_url": request.headers.origin + "payment"
+						    "return_url": request.headers.origin + "/payment"
 						  },
 						  "api": {
 						    "mode": "test"
