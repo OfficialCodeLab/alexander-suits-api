@@ -63,6 +63,9 @@ module.exports.routes = {
     'get /api/transactions/paymentOptions' : 'TransactionController.getPaymentOptions',
     'post /api/transactions/new' : 'TransactionController.createTransaction',
     'post /api/transactions/update' : 'TransactionController.updateTransaction',
+
+    //FUNCTIONS
+    'post /api/functions/uploadFile' : 'FunctionsController.uploadFile',
     /***************************************************************************
      *                                                                          *
      * Custom routes here...                                                    *
