@@ -35,7 +35,6 @@ module.exports = {
                 };
             }
             if (!!success) {
-                //TODO: update transaction in db first
                 return sails.models.transaction.update({
                     id: id
                 }, payment_data).then(transaction => {
