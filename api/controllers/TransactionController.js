@@ -29,27 +29,34 @@ module.exports = {
             let status = getStatus(payment_data.status);
             order_data.status = status;
             payment_data.status_english = status;
+            console.log(status);
 
             if (!!success) {
+              console.log("FOUND: " + success);
                 return sails.models.transaction.update({
                     id: id
                 }, payment_data).then(transaction => {
+                  console.log("TRANS: " + transaction);
                     if (!!transaction) {
                         return updateOrder({
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
-                                console.log(order.status);
+                                console.log("ORDER STATUS: " + order.status);
                                 if (order.status === "payment_processed") {
                                     completeOrder(order).then(()=>{
                                       console.log("success");
+                                      response.statusCode = 200;
+                                      response.status = 200;
+                                      response.json("kthnxbye");
                                     }).catch(ex => {
                                       console.log("failure");
                                     });
+                                } else {
+                                  response.statusCode = 200;
+                                  response.status = 200;
+                                  response.json("kthnxbye");
                                 }
-                                response.statusCode = 200;
-                                response.status = 200;
-                                response.json("kthnxbye");
                                 //Email user with transaction processing
                             } else {
                                 return Promise.reject("No order found!")
@@ -145,7 +152,7 @@ module.exports = {
                     },
                     "amount": {
                         "currency": "ZAR",
-                        "value": 250
+                        "value": 1
                     },
                     "app": {
                         "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
