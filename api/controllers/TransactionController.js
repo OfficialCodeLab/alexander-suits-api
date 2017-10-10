@@ -29,20 +29,20 @@ module.exports = {
             let status = getStatus(payment_data.status);
             order_data.status = status;
             payment_data.status_english = status;
-            console.log(status);
+            console.log(order_data);
 
             if (!!success) {
-              console.log("FOUND: " + success);
+              console.log("FOUND: " + JSON.stringify(success));
                 return sails.models.transaction.update({
                     id: id
                 }, payment_data).then(transaction => {
-                  console.log("TRANS: " + transaction);
+                  console.log("TRANS: " + JSON.stringify(transaction));
                     if (!!transaction) {
                         return updateOrder({
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
-                                console.log("ORDER STATUS: " + order.status);
+                                console.log("ORDER STATUS: " + JSON.stringify(order));
                                 if (order.status === "payment_processed") {
                                     completeOrder(order).then(()=>{
                                       console.log("success");
