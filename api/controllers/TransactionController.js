@@ -39,6 +39,7 @@ module.exports = {
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
+                                console.log(order.status);
                                 if (order.status === "payment_processed") {
                                     completeOrder(order).then(()=>{
                                       console.log("success");
