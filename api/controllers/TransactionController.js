@@ -40,10 +40,10 @@ module.exports = {
                         }, order_data).then(order => {
                             if (!!order) {
                                 if (order[0].status === "payment_processed") {
-                                    completeOrder(order).then(()=>{
+                                    completeOrder(order[0]).then(()=>{
                                       console.log("success");
                                     }).catch(ex => {
-                                      console.log("failure");
+                                      console.log("failure", ex);
                                     });
                                 }
 
@@ -71,10 +71,10 @@ module.exports = {
                     }, order_data).then(order => {
                         if (!!order) {
                             if (order[0].status === "payment_processed") {
-                                completeOrder(order).then(()=>{
+                                completeOrder(order[0]).then(()=>{
                                   console.log("success");
                                 }).catch(ex => {
-                                  console.log("failure");
+                                  console.log("failure", ex);
                                 });
                             }
                             //success
