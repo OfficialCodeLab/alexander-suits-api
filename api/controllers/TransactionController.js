@@ -23,18 +23,13 @@ module.exports = {
         sails.models.transaction.findOne({
             id: id
         }).then(success => {
-            let order_data;
-            if (payment_data.status === 0) {
-                order_data = {
-                    status: "processed",
-                    transaction_data: payment_data
-                };
-            } else {
-                order_data = {
-                    status: payment_data.status.state, //This is addPay only
-                    transaction_data: payment_data
-                };
-            }
+            let order_data  = {
+                transaction_data: payment_data
+            };
+            let status = getStatus(payment_data.status);
+            order_data.status = status;
+            payment_data.status_english = status;
+
             if (!!success) {
                 return sails.models.transaction.update({
                     id: id
@@ -44,10 +39,10 @@ module.exports = {
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
-                                if (order.status !== "failed" || order.status !== "4") {
+                                if (order.status === "payment_processed") {
                                     completeOrder(order).then(()=>{
                                       console.log("success");
-                                    }).catch(ex =>{
+                                    }).catch(ex => {
                                       console.log("failure");
                                     });
                                 }
@@ -127,14 +122,16 @@ module.exports = {
         sails.models.order.findOne({
             order_string: request.body.order_string
         }).then(or => {
-            if (or.status === "processed" || or.status === "in_progress" || or.status === "shipped" || or.status === "completed" || or.status === "cancelled_final") {
+            if (or.status === "processed" || or.status === "in_progress" || or.status === "shipped" || or.status === "completed" || or.status === "cancelled_final" || or.status === "payment_processed") {
                 response.statusCode = 400;
                 response.status = 400;
                 response.json("Order already processed");
             } else {
-                // completeOrder(or).then(() => {
-                //   console.log("success");
-                // });
+                if(request.body.method === "offline_payment") {
+                    completeOrder(or).then(() => {
+                      console.log("success");
+                    });
+                }
                 let names = or.user_data.name.split(' ');
                 let postBody = {
                     "method": request.body.method,
@@ -147,14 +144,14 @@ module.exports = {
                     },
                     "amount": {
                         "currency": "ZAR",
-                        "value": or.total
+                        "value": 250
                     },
                     "app": {
                         "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
                         "return_url": request.headers.origin + "/payment"
                     },
                     "api": {
-                        "mode": "test"
+                        "mode": "live"
                     }
                 };
 
@@ -170,14 +167,21 @@ module.exports = {
                     json: true,
                     body: postBody
                 }, function(error, res, body) {
+                  console.log(res.body);
                     if (error) {
                         sails.log.error(error);
                     } else {
+                      let orderUpdate = {
+                          transaction_id: res.body.id
+                      };
+                      if(request.body.method === "offline_payment") {
+                        orderUpdate.status = "awaiting_eft"
+                      } else {
+                        orderUpdate.status = "awaiting_payment"
+                      }
                         updateOrder({
                             order_string: request.body.order_string
-                        }, {
-                            transaction_id: res.body.id
-                        }).then(order => {
+                        }, orderUpdate).then(order => {
                             if (!!order) {
                                 //success
                                 // console.log("Logging success: ", order);
@@ -242,7 +246,7 @@ function completeOrder(order) {
 
         return emailService.renderEmailAsync("orderPlaced.html", _order).then((html, text) => {
           let subject = "Order Placed - " + order.order_string;
-          let to = "support@bloomweddings.co.za";
+          let to = order.contact_email + ", support@bloomweddings.co.za";
 
           return emailService.createMail(html, text, to, subject).then(() => {
             resolve(true);
@@ -251,4 +255,42 @@ function completeOrder(order) {
           reject(ex);
         });
     });
+}
+
+function getStatus(status) {
+  let _status;
+  switch(status) {
+    case 0: //PAYMENT_PROCESSED
+      _status = "payment_processed";
+      break;
+
+    case 1: //PAYMENT_PENDING
+      _status = "payment_pending";
+      break;
+
+    case 2: //PAYMENT_CANCELLED
+      _status = "failed";
+      break;
+
+    case 3: //PAYMENT_REFUNDED
+      _status = "failed";
+      break;
+
+    case 4: //PAYMENT_FAILED
+      _status = "failed";
+      break;
+
+    case 10: //PAYMENT_3DPENDING
+      _status = "payment_pending";
+      break;
+
+    case 11: //PAYMENT_3DAUTHED
+      _status = "payment_processed";
+      break;
+
+    default: //UNKNOWN
+      _status = payment_data.status;
+      break;
+  }
+  return _status;
 }

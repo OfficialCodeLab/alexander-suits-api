@@ -21,6 +21,9 @@ module.exports = {
     status: {
         type: "string"
     },
+    status_english: {
+        type: "string"
+    },
     isTest: {
         type: "string"
     },
