@@ -44,7 +44,7 @@ module.exports = {
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
-                                if (order.status === "processed" || (order.status === "payment_pending" && )) {
+                                if (order.status !== "failed" || order.status !== "4") {
                                     completeOrder(order).then(()=>{
                                       console.log("success");
                                     }).catch(ex =>{
