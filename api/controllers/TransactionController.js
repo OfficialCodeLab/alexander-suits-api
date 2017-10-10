@@ -17,6 +17,7 @@ module.exports = {
         console.log("FROM: " + request.headers.origin);
 
         let payment_data = request.body;
+        console.log(payment_data);
         let id = payment_data.id;
         // Check for existing payments in DB
         sails.models.transaction.findOne({
@@ -43,8 +44,12 @@ module.exports = {
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
-                                if (order.status === "processed") {
-                                    this.completeOrder();
+                                if (order.status === "processed" || (order.status === "payment_pending" && )) {
+                                    completeOrder(order).then(()=>{
+                                      console.log("success");
+                                    }).catch(ex =>{
+                                      console.log("failure");
+                                    });
                                 }
                                 response.statusCode = 200;
                                 response.status = 200;
@@ -127,6 +132,9 @@ module.exports = {
                 response.status = 400;
                 response.json("Order already processed");
             } else {
+                // completeOrder(or).then(() => {
+                //   console.log("success");
+                // });
                 let names = or.user_data.name.split(' ');
                 let postBody = {
                     "method": request.body.method,
@@ -214,7 +222,33 @@ function updateOrder(order, order_data) {
 
 function completeOrder(order) {
     return new Promise((resolve, reject) => {
-        resolve(true);
+        //complete order here
+        let items = [];
+        for(let product of order.products) {
+          let item = {
+            name: product.name,
+            desc: product.description,
+            count: product.count,
+            subtotal: (product.price * product.count).toFixed(2)
+          };
+          items.push(item);
+        }
+
+        let _order = {
+          number: order.order_string,
+          items: items,
+          total: order.total.toFixed(2)
+        };
+
+        return emailService.renderEmailAsync("orderPlaced.html", _order).then((html, text) => {
+          let subject = "Order Placed - " + order.order_string;
+          let to = "support@bloomweddings.co.za";
+
+          return emailService.createMail(html, text, to, subject).then(() => {
+            resolve(true);
+          })
+        }).catch(ex => {
+          reject(ex);
+        });
     });
-    //complete order here
 }

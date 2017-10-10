@@ -6,11 +6,12 @@ var path = require('path');
 let rek = require('rekuire');
 var mailcomposer = require('mailcomposer');
 var mailgun = require('mailgun-js');
+var EmailTemplates = require('swig-email-templates');
 var templates = new EmailTemplates({
-  root: path.join(__dirname, "templates")
+  root: path.join(__dirname, "../../templates")
 });
 
-var secrets = rek("secrets/sercrets.js");
+var secrets = rek("secrets/secrets.js");
 
 var mailgun = require('mailgun-js')({ apiKey: secrets.mailgun.apiKey, domain: secrets.mailgun.baseURL });
 
@@ -27,10 +28,12 @@ module.exports = {
   renderEmailAsync: function (template, options){
     return new Promise ((resolve, reject) => {
       let _options = typeof options  !== 'undefined' ? options : {};
+      // console.log(_options);
       templates.render(template, _options, function(err, html, text) {
         if(err) {
           reject(err);
         }
+        // console.log(html);
         resolve(html, text);
       });
     });
@@ -63,7 +66,14 @@ module.exports = {
 function sendMail (mailOptions) {
   return new Promise ((resolve, reject) => {
     if(mailOptions.to) {
-      if(validateEmail(mailOptions.to)){
+      let emails = mailOptions.to.split(', ');
+      // let flag = false;
+      let flags = [];
+      for(let email of emails) {
+        let flag = validateEmail(email);
+        flags.push(flag);
+      }
+      if(!flags.includes(false)){
           var data = {
             from: mailOptions.from,
             to: mailOptions.to,
