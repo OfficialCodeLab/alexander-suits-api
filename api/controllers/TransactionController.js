@@ -29,34 +29,28 @@ module.exports = {
             let status = getStatus(payment_data.status);
             order_data.status = status;
             payment_data.status_english = status;
-            console.log(order_data);
 
             if (!!success) {
-              console.log("FOUND: " + JSON.stringify(success));
                 return sails.models.transaction.update({
                     id: id
                 }, payment_data).then(transaction => {
-                  console.log("TRANS: " + JSON.stringify(transaction));
                     if (!!transaction) {
                         return updateOrder({
                             transaction_id: id
                         }, order_data).then(order => {
                             if (!!order) {
-                                console.log("ORDER STATUS: " + JSON.stringify(order));
-                                if (order.status === "payment_processed") {
+                                if (order[0].status === "payment_processed") {
                                     completeOrder(order).then(()=>{
                                       console.log("success");
-                                      response.statusCode = 200;
-                                      response.status = 200;
-                                      response.json("kthnxbye");
                                     }).catch(ex => {
                                       console.log("failure");
                                     });
-                                } else {
-                                  response.statusCode = 200;
-                                  response.status = 200;
-                                  response.json("kthnxbye");
                                 }
+
+                                response.statusCode = 200;
+                                response.status = 200;
+                                response.json("kthnxbye");
+
                                 //Email user with transaction processing
                             } else {
                                 return Promise.reject("No order found!")
@@ -76,8 +70,12 @@ module.exports = {
                         transaction_id: id
                     }, order_data).then(order => {
                         if (!!order) {
-                            if (order.status === "processed") {
-                                this.completeOrder();
+                            if (order[0].status === "payment_processed") {
+                                completeOrder(order).then(()=>{
+                                  console.log("success");
+                                }).catch(ex => {
+                                  console.log("failure");
+                                });
                             }
                             //success
                             response.statusCode = 200;
