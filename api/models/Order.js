@@ -66,6 +66,10 @@ module.exports = {
     agent_data: {
         type: "json",
         defaultsTo: {}
+    },
+    emails_sent: {
+      type: "json",
+      defaultsTo: {}
     }
   },
   types: {

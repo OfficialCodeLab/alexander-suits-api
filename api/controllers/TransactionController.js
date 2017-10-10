@@ -150,7 +150,7 @@ module.exports = {
                     },
                     "amount": {
                         "currency": "ZAR",
-                        "value": 1
+                        "value": or.total
                     },
                     "app": {
                         "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
@@ -255,7 +255,19 @@ function completeOrder(order) {
           let to = order.contact_email + ", support@bloomweddings.co.za";
 
           return emailService.createMail(html, text, to, subject).then(() => {
-            resolve(true);
+            let order_data = {
+              emails_sent: order.emails_sent
+            };
+            order_data.emails_sent.order_placed = true;
+            return updateOrder({
+                transaction_id: order.transaction_id
+            }, order_data).then(or => {
+              if(!!or) {
+                resolve(true);
+              } else {
+                reject("No order found");
+              }
+            });
           })
         }).catch(ex => {
           reject(ex);
