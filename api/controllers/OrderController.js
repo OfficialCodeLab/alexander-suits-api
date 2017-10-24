@@ -156,6 +156,45 @@ module.exports = {
 
 	},
 
+	updateStatus: (request, response) => {
+        console.log("Received POST for UPDATE Order status");
+        console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+        console.log("Body: ", JSON.stringify(request.body, null, 4));
+
+        let changes = {
+			status: request.body.status
+		};
+
+        let original = {
+            order_string: request.body.order_string
+        };
+
+        sails.models.order.update(original, changes).then(order => {
+            if(!!order) {
+                if (changes.status === 'processing') {
+					response.status(200).json(order);
+                    sendProcessingEmail(order);
+                } else if (order.changes.status === 'shipped') {
+					if(changes.shipping.tracking_number) {
+						let _delivery = order.delivery;
+						_delivery.tracking_number = order.changes.shipping.tracking_number;
+						updateOrder(original, {delivery: _delivery}).then(_order => {
+							response.status(200).json(_order);
+							sendShippedEmail(_order);	
+						});					
+					}
+				} else {
+					response.status(200).json(order);
+				}
+            } else {
+                response.status(400).json("Unable to find product");
+            }
+        }).catch(e => {
+			response.status(400).json(e);
+	})
+    },
+
 
 };
 
@@ -178,4 +217,104 @@ function addTransaction(transaction_data) {
 				reject(e);
 		})
 	});
+}
+
+function sendShippedEmail(order) {
+    return new Promise((resolve, reject) => {
+        if(order.emails_sent.order_shipped === true) {
+			resolve('Already done');
+		} else {
+			let items = [];
+			for(let product of order.products) {
+			  let item = {
+				name: product.name,
+				desc: product.description,
+				count: product.count,
+				subtotal: (product.price * product.count).toFixed(2)
+			  };
+			  items.push(item);
+			}
+	
+			let _order = {
+			  number: order.order_string,
+			  items: items,
+			  total: order.total.toFixed(2),
+			  shipping_ref: order.delivery.tracking_number,
+			  shipper: "DHL"
+			};
+	
+			return emailService.renderEmailAsync("orderPlaced.html", _order).then((html, text) => {
+			  let subject = "Order Placed - " + order.order_string;
+			  let to = order.contact_email + ", support@bloomweddings.co.za";
+	
+			  return emailService.createMail(html, text, to, subject).then(() => {
+				let order_data = {
+				  emails_sent: order.emails_sent
+				};
+				order_data.emails_sent.order_shipped = true;
+				return updateOrder({
+					transaction_id: order.transaction_id
+				}, order_data).then(or => {
+				  if(!!or) {
+					resolve(true);
+				  } else {
+					reject("No order found");
+				  }
+				});
+			  })
+			}).catch(ex => {
+			  reject(ex);
+			});
+		}
+        
+    });
+}
+
+function sendProcessingEmail(order) {
+    return new Promise((resolve, reject) => {
+        if(order.emails_sent.order_processing === true) {
+			resolve('Already done');
+		} else {
+			let items = [];
+			for(let product of order.products) {
+			  let item = {
+				name: product.name,
+				desc: product.description,
+				count: product.count,
+				subtotal: (product.price * product.count).toFixed(2)
+			  };
+			  items.push(item);
+			}
+	
+			let _order = {
+			  number: order.order_string,
+			  items: items,
+			  total: order.total.toFixed(2)
+			};
+	
+			return emailService.renderEmailAsync("orderPlaced.html", _order).then((html, text) => {
+			  let subject = "Order Placed - " + order.order_string;
+			  let to = order.contact_email + ", support@bloomweddings.co.za";
+	
+			  return emailService.createMail(html, text, to, subject).then(() => {
+				let order_data = {
+				  emails_sent: order.emails_sent
+				};
+				order_data.emails_sent.order_processing = true;
+				return updateOrder({
+					transaction_id: order.transaction_id
+				}, order_data).then(or => {
+				  if(!!or) {
+					resolve(true);
+				  } else {
+					reject("No order found");
+				  }
+				});
+			  })
+			}).catch(ex => {
+			  reject(ex);
+			});
+		}
+        
+    });
 }
