@@ -12,15 +12,25 @@ module.exports = {
 
         console.log("Body: ", JSON.stringify(request.body, null, 4));
 
-        sails.models.product.create(request.body).then(success => {
-            console.log("Logging success: ", success);
-            response.json(success);
-        }).catch(ex => {
-            response.statusCode = 400;
-            response.status = 400;
-            console.log(ex);
-            response.json(ex);
-        })
+        //for each product category:
+        //-- create product:
+        //-- if suit:
+        //---- use suit specific data(extracted suit price category, weave other, etc)
+        //---- use shirt specific data(extracted shirt price category, weave shirt, etc)
+        //-- generate product sku with shortid
+        //-- append image sketch for each product type (Suit, Shirt, Trousers, etc)
+        // CREATE PROMISE ARRAY
+        // response 200 if success
+
+        // sails.models.product.create(request.body).then(success => {
+        //     console.log("Logging success: ", success);
+        //     response.json(success);
+        // }).catch(ex => {
+        //     response.statusCode = 400;
+        //     response.status = 400;
+        //     console.log(ex);
+        //     response.json(ex);
+        // })
     },
 
     getAll: (request, response) => {
@@ -46,3 +56,11 @@ module.exports = {
         })
     }
 };
+
+function extractPrice(object) {
+    //{ id: "1", name: "Category 1 - R7,500.00" }
+    console.log(object.name);
+    let split = object.name.split(' - ');
+    let value = split[1].substring(1, split[1].length-3);
+    console.log(parseFloat(value.replace(/,/g, '')));
+}

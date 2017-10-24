@@ -16,6 +16,12 @@ module.exports = {
             unique: true,
             required: true
         },
+        article_number: {
+            type: "string"
+        },
+        colour_number: {
+            type: "string"
+        },
         name: {
             type: "string",
             required: true
@@ -24,9 +30,42 @@ module.exports = {
             type: "string",
             required: false
         },
+        description_long: {
+            type: "string",
+            required: false
+        },
         category: {
             type: "string",
             required: true
+        },
+        print: {
+            type: "string",
+        },
+        print_type: {
+            type: "string",
+        },
+        primary_colour: {
+            type: "string",
+        },
+        secondary_colours: {
+            type: "Array",
+            defaultsTo: []
+        },
+        fabric_type: {
+            type: "string",
+        },
+        fabric_subtype: {
+            type: "string",
+        },
+        weave_description: {
+            type: "string",
+        },
+        collections: {
+            type: "Array",
+            defaultsTo: []
+        },
+        price_category: {
+            type: "string",
         },
         price: {
             type: "float",
@@ -42,7 +81,8 @@ module.exports = {
             defaultsTo: []
         },
         estimated_stock_remaining: {
-            type: "integer"
+            type: "float",
+            decimal2: true,
         }
     },
     types: {
