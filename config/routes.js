@@ -58,6 +58,7 @@ module.exports.routes = {
     'get /api/order/all' : 'OrderController.getAll',
     'post /api/order/create' : 'OrderController.createOrder',
     'post /api/order/update' : 'OrderController.updateOrder',
+    'post /api/order/update_status' : 'OrderController.updateStatus',
 
     //TRANSACTION
     'get /api/transactions/paymentOptions' : 'TransactionController.getPaymentOptions',
