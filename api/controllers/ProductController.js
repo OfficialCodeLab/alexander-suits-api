@@ -108,9 +108,32 @@ module.exports = {
         //   };
         // }
 
-        sails.models.product.find().then(success => {
+        console.log(request.query);
+        let options = {};
+        if(request.query.collections) {
+            // options = {collections: {contains: request.query.collections}};
+        } else {
+            options = request.query;
+        }
+        console.log(options);
+
+        sails.models.product.find(options).then(success => {
             console.log("Logging success: ", success);
-            response.json(success);
+            if(!!success) {
+                let _products = [];
+                if(request.query.collections) {
+                    for(let p of success) {
+                        if(!!p.collections && p.collections.includes(request.query.collections)) {
+                            _products.push(p);
+                        }
+                    }
+                    response.status(200).json(_products);  
+                } else {
+                    response.status(200).json(success);  
+                }              
+            } else {
+                response.status(400).json([]);
+            }
         }).catch(ex => {
             response.statusCode = 400;
             response.status = 400;

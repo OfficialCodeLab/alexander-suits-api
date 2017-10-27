@@ -4,12 +4,17 @@
  * @description :: Server-side logic for managing orders
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+
+let pluralize = require('pluralize');
+let shortid = require('shortid');
+
 module.exports = {
 	createOrder: (request, response) => {
 			console.log("Received POST for CREATE ORDER");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
 			let cart_data = request.body;
+			// cart_data.id = shortid.generate();
 
 			// Get products and totals
 			sails.models.cart.findOne({
@@ -204,7 +209,7 @@ module.exports = {
 								sendProcessingEmail(order[0]);
 									response.status(200).json(order[0]);
 							} else if (changes.status === 'shipped') {
-									if (!!request.body.delivery.tracking_number) {
+									if (!!request.body.delivery) {
 											let _delivery = order[0].delivery || {};
 											_delivery.tracking_number = request.body.delivery.tracking_number;
 											updateOrder(original, {
@@ -217,7 +222,7 @@ module.exports = {
 										response.status(200).json(order[0]);
 									}
 							} else {
-									response.status(200).json(order[0]);
+								response.status(200).json(order[0]);
 							}
 					} else {
 							response.status(400).json("Unable to find product");
@@ -259,13 +264,14 @@ function sendShippedEmail(order) {
 			} else {
 					let items = [];
 					for (let product of order.products) {
-							let item = {
-									name: product.name,
-									desc: product.description,
-									count: product.count,
-									subtotal: (product.price * product.count).toFixed(2)
-							};
-							items.push(item);
+						let fullname = product.name + ", " + __.capitalize(pluralize.singular(product.category));
+						let item = {
+							name: fullname,
+							desc: product.description,
+							count: product.count,
+							subtotal: (product.price * product.count).toFixed(2)
+						};
+						items.push(item);
 					}
 
 					let _order = {
@@ -314,13 +320,14 @@ function sendProcessingEmail(order) {
 			} else {
 					let items = [];
 					for (let product of order.products) {
-							let item = {
-									name: product.name,
-									desc: product.description,
-									count: product.count,
-									subtotal: (product.price * product.count).toFixed(2)
-							};
-							items.push(item);
+						let fullname = product.name + ", " + __.capitalize(pluralize.singular(product.category));
+						let item = {
+							name: fullname,
+							desc: product.description,
+							count: product.count,
+							subtotal: (product.price * product.count).toFixed(2)
+						};
+						items.push(item);
 					}
 
 					let _order = {

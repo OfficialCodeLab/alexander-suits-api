@@ -7,6 +7,7 @@
 let req = require('request');
 let rek = require('rekuire');
 let secrets = rek('secrets/secrets.js');
+let pluralize = require('pluralize');
 
 module.exports = {
 
@@ -29,72 +30,59 @@ module.exports = {
             let status = getStatus(payment_data.status);
             order_data.status = status;
             payment_data.status_english = status;
-
-            if (!!success) {
-                return sails.models.transaction.update({
-                    id: id
-                }, payment_data).then(transaction => {
-                    if (!!transaction) {
-                        return updateOrder({
-                            transaction_id: id
-                        }, order_data).then(order => {
-                            if (!!order) {
-                                if (order[0].status === "payment_processed") {
-                                    completeOrder(order[0]).then(()=>{
-                                      console.log("success");
-                                    }).catch(ex => {
-                                      console.log("failure", ex);
-                                    });
-                                }
-
-                                response.statusCode = 200;
-                                response.status = 200;
-                                response.json("kthnxbye");
-
-                                //Email user with transaction processing
+            
+            return updateOrder({
+                transaction_id: id
+            }, order_data).then(order => {
+                if(!!order) {
+                    let total = order[0].total;
+                    payment_data.amount = total;
+                    if (!!success) {
+                        return sails.models.transaction.update({
+                            id: id
+                        }, payment_data).then(transaction => {
+                            if(!!transaction) {
+                                internalComplete(order[0]);
                             } else {
-                                return Promise.reject("No order found!")
+                                return Promise.reject("Transaction update failed");
                             }
-                        })
+                        });
                     } else {
-                        return Promise.reject("Transaction update failed");
-                    }
-                })
-            } else {
-                //Create transaction
-                return sails.models.transaction.create(payment_data).then(transaction => {
-                    // order_data.transaction_data = payment_data;
-
-                    //Update order
-                    return updateOrder({
-                        transaction_id: id
-                    }, order_data).then(order => {
-                        if (!!order) {
-                            if (order[0].status === "payment_processed") {
-                                completeOrder(order[0]).then(()=>{
-                                  console.log("success");
-                                }).catch(ex => {
-                                  console.log("failure", ex);
-                                });
+                        //Create transaction
+                        return sails.models.transaction.create(payment_data).then(transaction => {
+                            // order_data.transaction_data = payment_data;
+                            if(!!transaction) {
+                                internalComplete(order[0]);
+                            } else {
+                                return Promise.reject("Transaction create failed");
                             }
-                            //success
-                            response.statusCode = 200;
-                            response.status = 200;
-                            response.json("kthnxbye");
-                            //Email user with transaction processing
-                        } else {
-                            return Promise.reject("No order found!")
-                        }
-
-                    })
-                })
-            }
+                        });                                
+                    }
+                } else {
+                    return Promise.reject("Order update failed");
+                }
+            });
         }).catch(ex => {
             console.log(ex);
             response.statusCode = 400;
             response.status = 400;
             response.json(ex);
-        })
+        });
+
+
+        function internalComplete(order) {
+            if (order.status === "payment_processed") {
+                completeOrder(order).then(()=>{
+                    console.log("success");
+                }).catch(ex => {
+                    console.log("failure", ex);
+                });
+            }
+
+            response.statusCode = 200;
+            response.status = 200;
+            response.json("kthnxbye");
+        }
 
     },
 
@@ -235,8 +223,9 @@ function completeOrder(order) {
         //complete order here
         let items = [];
         for(let product of order.products) {
+          let fullname = product.name + ", " + __.capitalize(pluralize.singular(product.category));
           let item = {
-            name: product.name,
+            name: fullname,
             desc: product.description,
             count: product.count,
             subtotal: (product.price * product.count).toFixed(2)
