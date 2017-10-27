@@ -109,21 +109,23 @@ module.exports = {
         // }
 
         console.log(request.query);
-        let options = {};
-        if(request.query.collections) {
+        let options = request.query;
+        let _options = {};
+        if(options.collections) {
             // options = {collections: {contains: request.query.collections}};
-        } else {
-            options = request.query;
+            _options.collections = options.collections;
+            delete options['collections'];
         }
+
         console.log(options);
 
         sails.models.product.find(options).then(success => {
             console.log("Logging success: ", success);
             if(!!success) {
                 let _products = [];
-                if(request.query.collections) {
+                if(_options.collections) {
                     for(let p of success) {
-                        if(!!p.collections && p.collections.includes(request.query.collections)) {
+                        if(!!p.collections && p.collections.includes(_options.collections)) {
                             _products.push(p);
                         }
                     }
