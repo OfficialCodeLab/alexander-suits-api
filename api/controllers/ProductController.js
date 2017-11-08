@@ -25,23 +25,23 @@ module.exports = {
                 if(category === 'Suit') {
                     _product.price = getPrice(_product, "suit");
                     _product.weave_description = _product.weaves_desc_suit;
-                    _product.image_urls.push('image here');
+                    _product.image_urls.push('http://res.cloudinary.com/dhb9izfva/image/upload/v1509286904/casual-suit_b2fhwn.png');
                 } else if (category === 'Shirt') {
                     _product.price = getPrice(_product, "shirt");
                     _product.weave_description = _product.weaves_desc_shirt;
-                    _product.image_urls.push('image here');
+                    _product.image_urls.push('http://res.cloudinary.com/dhb9izfva/image/upload/v1510135548/smart-shirt_b0psgm.png');
                 } else if (category === 'Trouser') {
                     _product.price = getPrice(_product, "suit") * 0.22;
                     _product.weave_description = _product.weaves_desc_suit;
-                    _product.image_urls.push('image here');
+                    _product.image_urls.push('http://res.cloudinary.com/dhb9izfva/image/upload/v1509287057/Trousers-01_mre2kg.png');
                 } else if (category === 'Jacket') {
                     _product.price = getPrice(_product, "suit") * 0.80;
                     _product.weave_description = _product.weaves_desc_suit;
-                    _product.image_urls.push('image here');
+                    _product.image_urls.push('http://res.cloudinary.com/dhb9izfva/image/upload/v1509286904/casual-suit_b2fhwn.png');
                 } else if (category === 'Waistcoat') {
                     _product.price = getPrice(_product, "suit") * 0.18;
                     _product.weave_description = _product.weaves_desc_suit;
-                    _product.image_urls.push('image here');
+                    _product.image_urls.push('http://res.cloudinary.com/dhb9izfva/image/upload/v1510135547/waistcoast_tnotob.png');
                 } else {
                     console.log("Invalid attributes");
                     reject("Invalid attributes");
