@@ -76,6 +76,10 @@ module.exports = {
             type: "json",
             defaultsTo: {}
         },
+        extra_products: {
+            type: "json",
+            defaultsTo: []
+        },
         image_urls: {
             type: "Array",
             defaultsTo: []
@@ -83,7 +87,10 @@ module.exports = {
         estimated_stock_remaining: {
             type: "float",
             decimal2: true,
-        }
+        },
+        supplier_name: {
+            type: "string",
+        },
     },
     types: {
       decimal2: function(number){
