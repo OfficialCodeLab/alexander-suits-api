@@ -127,6 +127,7 @@ module.exports = {
                     });
                 }
                 let names = or.user_data.name.split(' ');
+                let total = makeFLoat(or.total);
                 let postBody = {
                     "method": request.body.method,
                     "reference": request.body.order_string,
@@ -138,7 +139,7 @@ module.exports = {
                     },
                     "amount": {
                         "currency": "ZAR",
-                        "value": or.total
+                        "value": total
                     },
                     "app": {
                         "notify_url": "https://as.api.pear-cap.com/api/transactions/update",
@@ -262,6 +263,13 @@ function completeOrder(order) {
           reject(ex);
         });
     });
+}
+
+function makeFLoat(num) {
+    if(num %1 === 0) {
+        return num * 100;
+    } 
+    return num;
 }
 
 function getStatus(status) {

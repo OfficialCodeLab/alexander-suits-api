@@ -24,6 +24,9 @@ module.exports = {
 							// console.log("Logging success: ", success);
 							// response.json(success);
 							cart_data.total = success.total;
+							let shipping_costs = processShipping(cart_data);
+							cart_data.total += shipping_costs;
+							cart_data.delivery_data.cost = shipping_costs;
 							cart_data.products = success.products;
 							cart_data.status = "Payment Pending";
 
@@ -254,6 +257,30 @@ function addTransaction(transaction_data) {
 					reject(e);
 			})
 	});
+}
+
+function processShipping(cart) {
+	if (!!cart.delivery_data && cart.delivery_data.method === "DHL") { //CHANGE THIS
+		if(!!cart.address_data && cart.address_data.country !== "South Africa") {
+			return 160;
+		}
+		let shirtcount = 0;
+		for(const p of cart.products) {
+			if(p.category === "Suit") {
+				return 160;
+			} else if(p.category === "Shirt") {
+				if(p.count > 1) {
+					return 160 + ".00 (2+ Shirts)";
+				}
+				shirtcount++;        
+			}
+		}
+		if(shirtcount > 1) {
+			return 160;
+		}
+		return 75;
+	}
+	return 0;
 }
 
 function sendShippedEmail(order) {
