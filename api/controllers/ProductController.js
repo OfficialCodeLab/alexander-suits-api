@@ -96,6 +96,61 @@ module.exports = {
 
     },
 
+    getInfo: (request, response) => {
+        console.log("Received GET for PRODUCT INFO");
+        console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+        // console.log(request.body)
+
+        //set up product and calc price
+        let products = request.body.products;
+        let promises = [];
+        for (let product of products) {
+            let promise = new Promise((resolve, reject) => {
+                let old_product = product;
+                let options = {
+                    id: product.id
+                };
+                sails.models.product.findOne(options).then(success => {
+                    if(success) {
+                        let p = {
+                            product_SKU: success.id,
+                            price: success.price,
+                            name: success.name,
+                            description: success.description,
+                            category: success.category,
+                            image_urls: success.image_urls,
+                            count: old_product.count
+                        };
+                        if(old_product.category === 'Suit') {
+                            if(!!old_product.extras && !_.isEmpty(old_product.extras)) {
+                                console.log(old_product.extras);
+                                console.log("LOLWUT");
+                                p = productService.processSuit(p, old_product);
+                            }
+                        }
+                        resolve(p);
+                    } else {
+                        response.json({status:"does_not_exist"});
+                    }
+                }).catch(ex => {
+                    response.statusCode = 400;
+                    response.status = 400;
+                    response.json(ex);
+                    reject();
+                })
+            });
+
+            promises.push(promise);
+        }
+
+
+        //Resolve all promises then update cart
+        Promise.all(promises).then(_products => {
+            response.status(200).json(_products);
+        });
+    },
+
     getAll: (request, response) => {
         console.log("Received GET for All Products");
         console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
