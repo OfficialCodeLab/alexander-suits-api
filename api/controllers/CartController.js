@@ -206,14 +206,29 @@ function mergeProducts (products1, products2) {
 
 	let new_products = products1.concat(products2);
 	let final_products = [];
-	let sortedArr = toolifier.objects.sortByKey(new_products, 'product_SKU');
-	var current = sortedArr[0];
-	for (var i = 1; i < sortedArr.length; i++) {
+	let _sortedArr = new_products.sort(function(a, b){
+		return b.length - a.length;
+	});
+	let sortedArr = toolifier.objects.sortByKey(_sortedArr, 'product_SKU');
+	let current = sortedArr[0];
+	for (let i = 1; i < sortedArr.length; i++) {
 		if (sortedArr[i].product_SKU != current.product_SKU) {
 				final_products.push(current);
 				current = sortedArr[i];
 		} else {
-				current.count += sortedArr[i].count;
+			//Merge everything if objects are similar enough 
+			let tempcount = sortedArr[i].count;
+			sortedArr[i].count = current.count;
+			let flag = __.isEquivalent(sortedArr[i], current)
+
+			if(!flag) {
+				//Products are too dissimilar
+				final_products.push(current);
+				current = sortedArr[i];
+			} else {
+				current.count += tempcount;
+			}
+
 		}
 	}
 	final_products.push(current);
