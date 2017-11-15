@@ -124,8 +124,8 @@ module.exports = {
                         };
                         if(old_product.category === 'Suit') {
                             if(!!old_product.extras && !_.isEmpty(old_product.extras)) {
-                                console.log(old_product.extras);
-                                console.log("LOLWUT");
+                                // console.log(old_product.extras);
+                                // console.log("LOLWUT");
                                 p = productService.processSuit(p, old_product);
                             }
                         }

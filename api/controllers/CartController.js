@@ -6,6 +6,7 @@
  */
 
 let toolifier = require('toolifier');
+let shortid = require('shortid');
 let _ = require('lodash');
 
 module.exports = {
@@ -28,7 +29,7 @@ module.exports = {
 			console.log("Received POST for UPDATE CART");
 			console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
 
-			// console.log(request.body)
+			console.log(request.body)
 
 			//set up product and calc price
 			let products = request.body.products;
@@ -58,10 +59,9 @@ module.exports = {
 									// 	reject();
 									// }
 									if(!!old_product.extras && !_.isEmpty(old_product.extras)) {
-										console.log(old_product.extras);
-										console.log("LOLWUT");
 										p = productService.processSuit(p, old_product);
 									}
+									// console.log("no extras");
 									// if(_p === "Price Mismatch") {
 									// 	response.status(400).json("Prices do not match. BEGONE CRIMINAL SCUM");
 									// 	reject();
@@ -69,6 +69,7 @@ module.exports = {
 									// 	p = _p;
 									// }
 								}
+								console.log(p);
 								resolve(p);
 							} else {
 								response.json({status:"does_not_exist"});
@@ -77,7 +78,7 @@ module.exports = {
 							response.statusCode = 400;
 							response.status = 400;
 							response.json(ex);
-							reject();
+							reject(ex);
 					})
 				});
 
@@ -88,14 +89,18 @@ module.exports = {
 			//Resolve all promises then update cart
 			Promise.all(promises).then(_products => {
 				let total_price = 0;
-			  for(let _p of _products) {
+			    for(let _p of _products) {
 					total_price += _p.price*_p.count;
 				}
+				console.log("ok continue")
 				sails.models.cart.findOne({user_id: request.body.user_id}).then(success => {
 					if(success) {	//UPDATE EXISTING
-
+						// console.log("merging");
 						//Merge products & price
 						let new_price = total_price += success.total;
+						if(new_price < 0) {
+							new_price = 0;
+						}
 						let final_products = mergeProducts(success.products, _products);
 
 						let value = {
@@ -195,6 +200,72 @@ module.exports = {
 			}
 	},
 
+	merge: (request, response) => {
+		console.log("Received POST for MERGE LOCAL CART");
+		console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+		//set up product and calc price
+		let products = request.body.products;
+		products = products.concat(request.body._products);
+		// console.log(products);
+		let promises = [];
+		// console.log(products.length);
+		for (let product of products) {
+			let promise = new Promise((resolve, reject) => {
+				let old_product = product;
+				let options = {
+					id: product.id
+				};
+				sails.models.product.findOne(options).then(success => {
+					if(success) {
+						let p = {
+							product_SKU: success.id,
+							id: success.id,
+							price: success.price,
+							name: success.name,
+							description: success.description,
+							category: success.category,
+							image_urls: success.image_urls,
+							count: old_product.count
+						};
+						if(old_product.category === 'Suit') {
+							if(!!old_product.extras && !_.isEmpty(old_product.extras)) {
+								p = productService.processSuit(p, old_product);
+							}
+						}
+						resolve(p);
+					} else {
+						response.json({status:"does_not_exist"});
+					}
+				}).catch(ex => {
+					response.statusCode = 400;
+					response.status = 400;
+					response.json(ex);
+					reject();
+				})
+			});
+
+			promises.push(promise);
+		}
+
+
+		//Resolve all promises then update cart
+		Promise.all(promises).then(_products => {
+			let merged_products = mergeProducts(_products, []);
+			let total_price = 0;
+			for(let _p of merged_products) {
+				total_price += _p.price*_p.count;
+			}
+			let cart = {
+				user_id: shortid.generate(),
+				products: merged_products,
+				total: total_price
+			}
+			response.status(200).json(cart);
+		});
+		
+		
+	},
+
 
 
 
@@ -205,40 +276,55 @@ module.exports = {
 function mergeProducts (products1, products2) {
 
 	let new_products = products1.concat(products2);
-	let final_products = [];
-	let _sortedArr = new_products.sort(function(a, b){
-		return b.length - a.length;
-	});
-	let sortedArr = toolifier.objects.sortByKey(_sortedArr, 'product_SKU');
-	let current = sortedArr[0];
-	for (let i = 1; i < sortedArr.length; i++) {
-		if (sortedArr[i].product_SKU != current.product_SKU) {
-				final_products.push(current);
-				current = sortedArr[i];
-		} else {
-			//Merge everything if objects are similar enough 
-			let tempcount = sortedArr[i].count;
-			sortedArr[i].count = current.count;
-			let flag = __.isEquivalent(sortedArr[i], current)
-
-			if(!flag) {
-				//Products are too dissimilar
-				final_products.push(current);
-				current = sortedArr[i];
-			} else {
-				current.count += tempcount;
-			}
-
-		}
+	if(new_products.length <= 1) {
+		return new_products;
 	}
-	final_products.push(current);
+	let final_products = [];
+	let sortedArr = toolifier.objects.sortByKey(new_products, 'product_SKU');
+	// console.log(sortedArr.length);
+	let current = sortedArr[0];
+	let currentIndex = 0;
+	let i = 0;
+	//Iterate through array
+	while(currentIndex <= sortedArr.length-1){
+		if(i >= sortedArr.length-1) {
+			currentIndex++;
+			// console.log("ITERATING" + currentIndex + " " + i);
+			final_products.push(current);
+			current = sortedArr[currentIndex];
+			i = currentIndex;
+		} else {
+			i++;
+			// console.log("COMPARING" + currentIndex + " " + i);
+			if (sortedArr[i].product_SKU != current.product_SKU) { //Check if SKUs do not match, if they don't then ignore
+				i = sortedArr.length;
+			} else { //SKUs do match, but do objects match?
+				//Temporarily store the count, because this prop should be ignored for the equivalence
+				const tempcount = sortedArr[i].count;
+				sortedArr[i].count = current.count;
+				//Check if objects are equivalent
+				let flag = __.isEquivalent(sortedArr[i], current)
+				sortedArr[i].count = tempcount;
+	
+				if(!flag) {
+					//Products are too dissimilar, ignore
+				} else {
+					current.count += sortedArr[i].count;
+					sortedArr[i].count = 0;
+					// console.log("changing counts");
+				}
+			}
+		}
+
+	}
 
 	let final = [];
 	for(let product of final_products) {
-		if(product.count != 0) {
+		if(product.count > 0) {
 			final.push(product);
 		}
 	}
+	// console.log(final);
 
 	return final.reverse();
 }

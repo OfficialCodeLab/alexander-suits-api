@@ -31,7 +31,7 @@ module.exports = {
 		let price = fetched.price;
 		let new_product = fetched;
 		let extra_products = [];
-		console.log(new_product);
+		// console.log(new_product);
 		
 		if(sent.extras.pants === null) {
 		  price = price * 0.8;
@@ -47,7 +47,7 @@ module.exports = {
 		  extra_products.push(extra_pants);
 	
 		}
-		console.log(extra_products);
+		// console.log(extra_products);
 	
 		//Mockup garment
 		if(sent.extras.mockup) {
@@ -72,7 +72,7 @@ module.exports = {
 			  price += currentPrice;
 			extra_products.push(mockup);
 		}
-		console.log(extra_products);
+		// console.log(extra_products);
 	
 		//Oversize
 		if(sent.extras.oversize) {
@@ -101,12 +101,12 @@ module.exports = {
 		  };
 		  extra_products.push(item);
 		}
-		console.log(extra_products);
+		// console.log(extra_products);
 	
 		new_product.price = price;
 		new_product.extra_products = extra_products;
 		new_product.extras = sent.extras;
-		console.log(new_product);
+		// console.log(new_product);
 		return new_product;
 	},
 }

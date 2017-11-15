@@ -52,6 +52,7 @@ module.exports.routes = {
     'post /api/cart/update' : 'CartController.updateCart',
     'get /api/cart/create' : 'CartController.createCart',
     'delete /api/cart/delete' : 'CartController.deleteCart',
+    'post /api/cart/merge' : 'CartController.merge',
 
     //ORDER
     'get /api/order' : 'OrderController.getOrder',

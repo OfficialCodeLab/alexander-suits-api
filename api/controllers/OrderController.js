@@ -24,7 +24,9 @@ module.exports = {
 							// console.log("Logging success: ", success);
 							// response.json(success);
 							cart_data.total = success.total;
-							let shipping_costs = processShipping(cart_data);
+							console.log(cart_data);
+							let shipping_costs = processShipping(cart_data, success.products);
+							console.log(shipping_costs);
 							cart_data.total += shipping_costs;
 							cart_data.delivery_data.cost = shipping_costs;
 							cart_data.products = success.products;
@@ -259,13 +261,13 @@ function addTransaction(transaction_data) {
 	});
 }
 
-function processShipping(cart) {
+function processShipping(cart, products) {
 	if (!!cart.delivery_data && cart.delivery_data.method === "DHL") { //CHANGE THIS
 		if(!!cart.address_data && cart.address_data.country !== "South Africa") {
 			return 160;
 		}
 		let shirtcount = 0;
-		for(const p of cart.products) {
+		for(const p of products) {
 			if(p.category === "Suit") {
 				return 160;
 			} else if(p.category === "Shirt") {
