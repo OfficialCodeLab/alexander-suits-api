@@ -199,6 +199,72 @@ module.exports = {
         })
     },
 
+    getProduct: (request, response) => {
+        
+        console.log("Received GET for GET PRODUCT");
+        console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+        if (request.query) {
+                let options = request.query;
+
+                sails.models.product.findOne(options).then(success => {
+                        if (success) {
+                                console.log("Logging success: ", success);
+                                response.json(success);
+                        } else {
+                                response.json({
+                                        status: "does_not_exist"
+                                });
+                        }
+                }).catch(ex => {
+                        response.statusCode = 400;
+                        response.status = 400;
+                        response.json(ex);
+                })
+        } else {
+                response.statusCode = 400;
+                response.status = 400;
+                response.json({
+                        status: "no_id_provided"
+                });
+        }
+
+    },
+
+    updateProduct: (request, response) => {
+        
+        console.log("Received POST for UPDATE PRODUCT");
+        console.log("PROTOCOL: " + request.protocol + '://' + request.get('host') + request.originalUrl + "\n");
+
+        let product = request.body.product;
+        if(product.category === 'Suit') {
+            product.image_urls[2] = 'https://res.cloudinary.com/dhb9izfva/image/upload/v1510138880/casual-suit_wplfns.png';
+        } else if (product.category === 'Shirt') {
+            product.image_urls[2] = 'https://res.cloudinary.com/dhb9izfva/image/upload/v1510135548/smart-shirt_b0psgm.png';
+        } else if (product.category === 'Trouser') {
+            product.image_urls[2] = 'https://res.cloudinary.com/dhb9izfva/image/upload/v1509287057/Trousers-01_mre2kg.png';
+        } else if (product.category === 'Jacket') {
+            product.image_urls[2] = 'https://res.cloudinary.com/dhb9izfva/image/upload/v1510138880/casual-suit_wplfns.png';
+        } else if (product.category === 'Waistcoat') {
+            product.image_urls[2] = 'https://res.cloudinary.com/dhb9izfva/image/upload/v1510135547/waistcoast_tnotob.png';
+        } else {
+            console.log("Invalid attributes");
+            response.status = 400;
+            response.json(ex);
+        }
+
+       
+        sails.models.product.update({product_SKU: request.body.product_SKU}, product).then(success => {
+            console.log("Logging success: ", success);
+            response.json(success);
+        }).catch(ex => {
+            response.statusCode = 400;
+            response.status = 400;
+            response.json(ex);
+        })
+
+    },
+
     
 };
 

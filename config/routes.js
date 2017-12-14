@@ -46,6 +46,8 @@ module.exports.routes = {
     'post /api/products/create' : 'ProductController.createProduct',
     'get /api/products/all' : 'ProductController.getAll',
     'post /api/products/get_info' : 'ProductController.getInfo',
+    'get /api/product' : 'ProductController.getProduct',
+    'post /api/products/update' : 'ProductController.updateProduct',
     
     //CART
     'get /api/cart' : 'CartController.getCart',
