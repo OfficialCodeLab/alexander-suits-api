@@ -49,6 +49,12 @@ module.exports.routes = {
     'get /api/product' : 'ProductController.getProduct',
     'post /api/products/update' : 'ProductController.updateProduct',
     
+    //PRODUCTS
+    'post /api/linings/create' : 'LiningController.createLining',
+    'get /api/linings/all' : 'LiningController.getAll',
+    'get /api/lining' : 'LiningController.getLining',
+    'post /api/linings/update' : 'LiningController.updateLining',
+    
     //CART
     'get /api/cart' : 'CartController.getCart',
     'post /api/cart/update' : 'CartController.updateCart',
