@@ -19,6 +19,11 @@ module.exports = {
 
    hookTimeout: 120000,
 
+   models: {
+    migrate: 'safe',
+   },
+
+
   // models: {
   //   connection: 'someMysqlServer'
   // },
