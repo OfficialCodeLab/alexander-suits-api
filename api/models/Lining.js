@@ -34,6 +34,9 @@ module.exports = {
             type: "string",
             required: false
         },
+        print: {
+            type: "string",
+        },
         primary_colour: {
             type: "string",
         },
